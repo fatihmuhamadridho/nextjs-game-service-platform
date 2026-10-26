@@ -21,7 +21,7 @@
   flex: none;
 }
 
-.brand>a {
+.brand > a {
   display: flex;
   align-items: center;
   gap: 7px;
@@ -29,7 +29,7 @@
   text-decoration: none;
 }
 
-.brand>a svg {
+.brand > a svg {
   width: 28px;
   height: 26px;
   padding: 3px;
@@ -38,16 +38,16 @@
   color: #fff;
 }
 
-.brand>a b {
+.brand > a b {
   font-size: 18px;
   letter-spacing: -0.5px;
 }
 
-.brand>a b span {
+.brand > a b span {
   color: #1685ff;
 }
 
-.brand>small {
+.brand > small {
   padding: 4px 7px;
   border: 1px solid #2e4762;
   border-radius: 6px;
@@ -174,7 +174,7 @@
   font-size: 9px;
 }
 
-.profile>svg {
+.profile > svg {
   width: 14px;
   color: #a7b7c9;
 }
@@ -217,8 +217,8 @@
   font-size: 9px;
 }
 
-.profileDropdown>a,
-.profileDropdown>button {
+.profileDropdown > a,
+.profileDropdown > button {
   width: 100%;
   min-height: 37px;
   margin-top: 5px;
@@ -237,20 +237,20 @@
   cursor: pointer;
 }
 
-.profileDropdown>a:hover,
-.profileDropdown>a:focus-visible,
-.profileDropdown>button:hover,
-.profileDropdown>button:focus-visible {
+.profileDropdown > a:hover,
+.profileDropdown > a:focus-visible,
+.profileDropdown > button:hover,
+.profileDropdown > button:focus-visible {
   background: #34202a;
 }
 
-.profileDropdown>a svg,
-.profileDropdown>button svg {
+.profileDropdown > a svg,
+.profileDropdown > button svg {
   width: 15px;
   height: 15px;
 }
 
-.profileDropdown>button:disabled {
+.profileDropdown > button:disabled {
   opacity: 0.6;
   cursor: wait;
 }
@@ -282,16 +282,16 @@
     gap: 8px;
   }
 
-  .brand>a b {
+  .brand > a b {
     font-size: 16px;
   }
 
-  .brand>a svg {
+  .brand > a svg {
     width: 26px;
     height: 24px;
   }
 
-  .brand>small,
+  .brand > small,
   .search kbd,
   .profile {
     display: none;
@@ -361,7 +361,7 @@
     border-right: 1px solid #2a3d54;
   }
 
-  .mobileDrawer>div {
+  .mobileDrawer > div {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -369,7 +369,7 @@
     border-bottom: 1px solid #26374b;
   }
 
-  .mobileDrawer>div button {
+  .mobileDrawer > div button {
     border: 0;
     background: none;
     color: #fff;
@@ -388,11 +388,11 @@
     gap: 5px;
   }
 
-  .brand>a b {
+  .brand > a b {
     font-size: 14px;
   }
 
-  .brand>a svg {
+  .brand > a svg {
     width: 23px;
   }
 

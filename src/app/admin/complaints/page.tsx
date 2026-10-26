@@ -1,3 +1,3 @@
-import { AdminComplaintsPage } from '@features/AdminComplaints/views/pages/AdminComplaints.page';
+import { AdminComplaintsPage } from '@features/AdminComplaints/pages/AdminComplaints.page';
 
 export default AdminComplaintsPage;

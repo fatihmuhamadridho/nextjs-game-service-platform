@@ -1,3 +1,3 @@
-import { AdminDashboardPage } from '@features/AdminDashboard/views/pages/AdminDashboard.page';
+import { AdminDashboardPage } from '@features/AdminDashboard/pages/AdminDashboard.page';
 
 export default AdminDashboardPage;

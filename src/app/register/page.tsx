@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { RegisterPage } from '@features/Auth/views/pages/Register.page';
+import { RegisterPage } from '@features/Auth/pages/Register.page';
 import { notFound } from 'next/navigation';
 import { FEATURE_REGISTER } from '@configs/base.config';
 

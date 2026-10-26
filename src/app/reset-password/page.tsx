@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { ResetPasswordPage } from '@features/Auth/views/pages/ResetPassword.page';
+import { ResetPasswordPage } from '@features/Auth/pages/ResetPassword.page';
 import { notFound } from 'next/navigation';
 import { FEATURE_PASSWORD_RECOVERY } from '@configs/base.config';
 

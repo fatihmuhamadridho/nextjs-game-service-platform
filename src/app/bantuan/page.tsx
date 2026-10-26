@@ -1,4 +1,4 @@
-import { HelpPage } from '@features/Help/views/pages/Help.page';
+import { HelpPage } from '@features/Help/pages/Help.page';
 import { notFound } from 'next/navigation';
 import { FEATURE_SPRINT_2 } from '@configs/base.config';
 

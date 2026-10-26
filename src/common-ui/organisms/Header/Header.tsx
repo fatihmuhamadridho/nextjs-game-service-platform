@@ -1,6 +1,7 @@
 'use client';
 
 import { apiFetch } from '@services/apiFetch.service';
+import Link from 'next/link';
 
 import { useEffect, useRef, useState } from 'react';
 import {
@@ -41,14 +42,14 @@ type Props = {
   onMobileFilterToggle?: () => void;
 };
 const Logo = () => (
-  <a className={styles.logo} href="/">
+  <Link className={styles.logo} href="/">
     <span className={styles.logoIcon}>
       <IconDeviceGamepad2 />
     </span>
     <span>
       Joki<span>Hub</span>
     </span>
-  </a>
+  </Link>
 );
 
 export const Header = ({
@@ -88,8 +89,7 @@ export const Header = ({
         setAccount(null);
         return;
       }
-      const sessionUrl = () =>
-        `/api/auth/v1/session?accountType=${accountType}`;
+      const sessionUrl = () => `/api/auth/v1/session?accountType=${accountType}`;
       try {
         let response = await apiFetch(sessionUrl(), { cache: 'no-store' });
         if (!response.ok && response.status === 401) {
@@ -101,7 +101,8 @@ export const Header = ({
           const refreshUrl =
             refreshType === 'ADMIN' ? '/api/admin/auth/v1/refresh-token' : '/api/auth/v1/refresh-token';
           const refreshed = await apiFetch(refreshUrl, { method: 'POST', cache: 'no-store' });
-          if (refreshed.ok) response = await apiFetch(`/api/auth/v1/session?accountType=${refreshType}`, { cache: 'no-store' });
+          if (refreshed.ok)
+            response = await apiFetch(`/api/auth/v1/session?accountType=${refreshType}`, { cache: 'no-store' });
         }
         if (!active) return;
         if (!response.ok) {
@@ -215,9 +216,9 @@ export const Header = ({
             <small>{account.roleLabel}</small>
           </div>
           {account.canAccessDashboard && (
-            <a href="/admin" role="menuitem" onClick={() => setProfileOpen(false)}>
+            <Link href="/admin" role="menuitem" onClick={() => setProfileOpen(false)}>
               <IconLayoutDashboard aria-hidden="true" /> Dashboard Admin
-            </a>
+            </Link>
           )}
           <button role="menuitem" disabled={loggingOut} onClick={() => void logout()}>
             <IconLogout aria-hidden="true" /> {loggingOut ? 'Keluar…' : 'Keluar'}
@@ -240,12 +241,12 @@ export const Header = ({
         </button>
         <Logo />
         <nav className={styles.desktopNav} aria-label="Navigasi utama">
-          <a className={activePage === 'home' ? styles.active : ''} href="/">
+          <Link className={activePage === 'home' ? styles.active : ''} href="/">
             Beranda
-          </a>
-          <a href="/games">Games</a>
-          <a href="/cek-pesanan">Cek Pesanan</a>
-          {FEATURE_SPRINT_2 && <a href="/bantuan">Bantuan</a>}
+          </Link>
+          <Link href="/games">Games</Link>
+          <Link href="/cek-pesanan">Cek Pesanan</Link>
+          {FEATURE_SPRINT_2 && <Link href="/bantuan">Bantuan</Link>}
         </nav>
         {FEATURE_SPRINT_2 ? (
           variant === 'storefront' && (
@@ -279,13 +280,13 @@ export const Header = ({
                       <i>2</i>
                     </button>
                   )}
-                  <a className={styles.login} href="/login">
+                  <Link className={styles.login} href="/login">
                     Masuk
-                  </a>
+                  </Link>
                   {FEATURE_REGISTER && (
-                    <a className={styles.register} href="/register">
+                    <Link className={styles.register} href="/register">
                       Daftar
-                    </a>
+                    </Link>
                   )}
                 </>
               ) : null}
@@ -297,9 +298,9 @@ export const Header = ({
             </>
           ) : (
             (profileAction ?? (
-              <a className={styles.avatar} aria-label="Masuk" href="/login">
+              <Link className={styles.avatar} aria-label="Masuk" href="/login">
                 <IconUser />
-              </a>
+              </Link>
             ))
           )}
         </div>
@@ -322,29 +323,29 @@ export const Header = ({
                 <IconX />
               </button>
             </div>
-            <a href="/" onClick={() => setMenuOpen(false)}>
+            <Link href="/" onClick={() => setMenuOpen(false)}>
               Beranda
-            </a>
-            <a href="/games" onClick={() => setMenuOpen(false)}>
+            </Link>
+            <Link href="/games" onClick={() => setMenuOpen(false)}>
               Games
-            </a>
-            <a href="/cek-pesanan" onClick={() => setMenuOpen(false)}>
+            </Link>
+            <Link href="/cek-pesanan" onClick={() => setMenuOpen(false)}>
               Cek Pesanan
-            </a>
+            </Link>
             {FEATURE_SPRINT_2 && (
-              <a href="/bantuan" onClick={() => setMenuOpen(false)}>
+              <Link href="/bantuan" onClick={() => setMenuOpen(false)}>
                 Bantuan
-              </a>
+              </Link>
             )}
             {account === null && (
               <div className={styles.drawerAuthActions}>
-                <a className={styles.drawerLogin} href="/login" onClick={() => setMenuOpen(false)}>
+                <Link className={styles.drawerLogin} href="/login" onClick={() => setMenuOpen(false)}>
                   Masuk
-                </a>
+                </Link>
                 {FEATURE_REGISTER && (
-                  <a className={styles.drawerRegister} href="/register" onClick={() => setMenuOpen(false)}>
+                  <Link className={styles.drawerRegister} href="/register" onClick={() => setMenuOpen(false)}>
                     Daftar
-                  </a>
+                  </Link>
                 )}
               </div>
             )}

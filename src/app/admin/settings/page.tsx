@@ -1,3 +1,3 @@
-import { AdminSettingsPage } from '@features/AdminSettings/views/pages/AdminSettings.page';
+import { AdminSettingsPage } from '@features/AdminSettings/pages/AdminSettings.page';
 
 export default AdminSettingsPage;

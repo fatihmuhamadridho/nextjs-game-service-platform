@@ -1,3 +1,3 @@
-import { AdminOrdersPage } from '@features/AdminOrders/views/pages/AdminOrders.page';
+import { AdminOrdersPage } from '@features/AdminOrders/pages/AdminOrders.page';
 
 export default AdminOrdersPage;

@@ -1,0 +1,47 @@
+import type { JsonObject } from '@core/mock-data/domain/types';
+import { ago } from '@core/mock-data/infrastructure/time';
+
+export const transactions: JsonObject[] = [
+  {
+    id: 'TRX-001',
+    internalId: 'trx-001',
+    orderId: 'JH-20261025-A1B2C3',
+    customerName: 'Alya Putri',
+    customerContact: '+628123450001',
+    type: 'Pembayaran Pesanan',
+    method: 'QRIS',
+    amount: 50000,
+    status: 'Berhasil',
+    providerReference: 'MOCK-QRIS-001',
+    createdAt: ago(135),
+    settledAt: ago(130),
+  },
+  {
+    id: 'TRX-002',
+    internalId: 'trx-002',
+    orderId: 'JH-20261025-D4E5F6',
+    customerName: 'Bima Pratama',
+    customerContact: '+628123450002',
+    type: 'Pembayaran Pesanan',
+    method: 'Transfer Bank BCA',
+    amount: 20000,
+    status: 'Menunggu',
+    providerReference: 'MOCK-BCA-002',
+    createdAt: ago(30),
+    settledAt: '',
+  },
+  {
+    id: 'TRX-003',
+    internalId: 'trx-003',
+    orderId: 'JH-20261020-112233',
+    customerName: 'Citra Ananda',
+    customerContact: '+628123450003',
+    type: 'Refund',
+    method: 'QRIS',
+    amount: 15000,
+    status: 'Dikembalikan',
+    providerReference: 'MOCK-REFUND-003',
+    createdAt: ago(60 * 48),
+    settledAt: ago(60 * 47),
+  },
+];

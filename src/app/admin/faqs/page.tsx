@@ -1,3 +1,3 @@
-import { AdminFaqsPage } from '@features/AdminFaqs/views/pages/AdminFaqs.page';
+import { AdminFaqsPage } from '@features/AdminFaqs/pages/AdminFaqs.page';
 
 export default AdminFaqsPage;

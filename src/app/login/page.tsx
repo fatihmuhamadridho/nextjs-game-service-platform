@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { LoginPage } from '@features/Auth/views/pages/Login.page';
+import { LoginPage } from '@features/Auth/pages/Login.page';
 
 export const metadata: Metadata = {
   title: 'Masuk atau Daftar | JokiHub',

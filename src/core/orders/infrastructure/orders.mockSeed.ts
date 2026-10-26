@@ -1,0 +1,53 @@
+import type { OrderRecord } from '@core/mock-data/domain/types';
+import { ago } from '@core/mock-data/infrastructure/time';
+export const orders: OrderRecord[] = [
+  {
+    id: 'order-001',
+    internalId: 'order-001',
+    orderNumber: 'JH-20261025-A1B2C3',
+    orderStatus: 'IN_PROGRESS',
+    paymentStatus: 'PAID',
+    totalAmount: 50000,
+    gameId: 'game-ml',
+    gameName: 'Mobile Legends',
+    gameSlug: 'mobile-legends',
+    serviceId: 'svc-ml-rank',
+    serviceName: 'Joki Rank Mobile Legends',
+    quantity: 2,
+    paymentId: 'pay-001',
+    paymentMethod: 'QRIS',
+    customerName: 'Alya Putri',
+    customerWhatsapp: '+628123450001',
+    gameAccount: 'alya.demo',
+    gameServer: '1234',
+    customerNotes: '',
+    createdAt: ago(140),
+  },
+  {
+    id: 'order-002',
+    internalId: 'order-002',
+    orderNumber: 'JH-20261025-D4E5F6',
+    orderStatus: 'PENDING_REVIEW',
+    paymentStatus: 'PENDING_REVIEW',
+    totalAmount: 20000,
+    gameId: 'game-ff',
+    gameName: 'Free Fire',
+    gameSlug: 'free-fire',
+    serviceId: 'svc-ff-rank',
+    serviceName: 'Joki Rank Free Fire',
+    quantity: 1,
+    paymentId: 'pay-002',
+    paymentMethod: 'BCA_TRANSFER',
+    customerName: 'Bima Pratama',
+    customerWhatsapp: '+628123450002',
+    gameAccount: 'bima.demo',
+    gameServer: null,
+    customerNotes: '',
+    createdAt: ago(35),
+  },
+];
+
+export const trackingTokens = new Map<string, string>([
+  ['JH-20261025-A1B2C3', 'mock-track-a1b2c3'],
+  ['JH-20261025-D4E5F6', 'mock-track-d4e5f6'],
+]);

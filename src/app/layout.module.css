@@ -13,3 +13,13 @@
 .body {
   @apply m-0 font-sans;
 }
+
+.mockDataBanner {
+  padding: 6px 12px;
+  color: #ffe6a8;
+  background: #3b2a08;
+  border-bottom: 1px solid #7a5a18;
+  font-size: 12px;
+  line-height: 1.4;
+  text-align: center;
+}

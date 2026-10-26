@@ -1,3 +1,3 @@
-import { AdminServiceCategoriesPage } from '@features/AdminServiceCategories/views/pages/AdminServiceCategories.page';
+import { AdminServiceCategoriesPage } from '@features/AdminServiceCategories/pages/AdminServiceCategories.page';
 
 export default AdminServiceCategoriesPage;

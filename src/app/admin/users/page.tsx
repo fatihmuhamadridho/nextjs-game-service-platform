@@ -1,3 +1,3 @@
-import { AdminUsersPage } from '@features/AdminUsers/views/pages/AdminUsers.page';
+import { AdminUsersPage } from '@features/AdminUsers/pages/AdminUsers.page';
 
 export default AdminUsersPage;

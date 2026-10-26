@@ -1,4 +1,4 @@
-import { OrderTrackingPage } from '@features/OrderTracking/views/pages/OrderTracking.page';
+import { OrderTrackingPage } from '@features/OrderTracking/pages/OrderTracking.page';
 
 export default async function OrderTrackingRoute({ searchParams }: PageProps<'/cek-pesanan'>) {
   const query = await searchParams;

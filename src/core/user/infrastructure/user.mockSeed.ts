@@ -1,0 +1,40 @@
+import type { UserRecord } from '@core/mock-data/domain/types';
+import { ago } from '@core/mock-data/infrastructure/time';
+export const users: UserRecord[] = [
+  {
+    id: 'usr-001',
+    name: 'Alya Putri',
+    username: 'alya.putri',
+    email: 'alya@example.test',
+    whatsapp: '+628123450001',
+    tier: 'Gold',
+    status: 'ACTIVE',
+    orderCount: 8,
+    totalSpend: 420000,
+    joinedAt: ago(60 * 24 * 40),
+  },
+  {
+    id: 'usr-002',
+    name: 'Bima Pratama',
+    username: 'bima.play',
+    email: 'bima@example.test',
+    whatsapp: '+628123450002',
+    tier: 'Silver',
+    status: 'ACTIVE',
+    orderCount: 4,
+    totalSpend: 185000,
+    joinedAt: ago(60 * 24 * 22),
+  },
+  {
+    id: 'usr-003',
+    name: 'Citra Ananda',
+    username: 'citra.gg',
+    email: 'citra@example.test',
+    whatsapp: '+628123450003',
+    tier: 'Bronze',
+    status: 'BLOCKED',
+    orderCount: 2,
+    totalSpend: 60000,
+    joinedAt: ago(60 * 24 * 10),
+  },
+];

@@ -3,22 +3,19 @@
 import { apiFetch } from '@services/apiFetch.service';
 
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import {
   IconAdjustments,
-  IconBell,
   IconCreditCard,
   IconDeviceGamepad2,
   IconFileText,
   IconHeart,
-  IconHelpCircle,
   IconHistory,
   IconHomeFilled,
   IconListDetails,
   IconReceipt,
   IconShieldCheck,
-  IconTag,
   IconUsers,
-  IconWallet,
   IconX,
   IconLogout,
 } from '@tabler/icons-react';
@@ -138,7 +135,7 @@ export const AdminSidebar = ({ open, onClose, activeItem = 'Dashboard' }: Props)
             <section key={group.label || 'dashboard'}>
               {group.label && <h2>{group.label}</h2>}
               {group.items.map(([label, Icon]) => (
-                <a
+                <Link
                   key={label}
                   href={routeFor(label)}
                   className={label === activeItem ? styles.active : ''}
@@ -146,7 +143,7 @@ export const AdminSidebar = ({ open, onClose, activeItem = 'Dashboard' }: Props)
                 >
                   <Icon />
                   <span>{label}</span>
-                </a>
+                </Link>
               ))}
             </section>
           ))}

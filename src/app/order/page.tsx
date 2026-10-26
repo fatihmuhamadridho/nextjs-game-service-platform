@@ -1,4 +1,4 @@
-import { CheckoutPage } from '@features/Checkout/views/pages/Checkout.page';
+import { CheckoutPage } from '@features/Checkout/pages/Checkout.page';
 
 export default async function OrderSelectionRoute({ searchParams }: PageProps<'/order'>) {
   const query = await searchParams;

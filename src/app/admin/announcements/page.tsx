@@ -1,3 +1,3 @@
-import { AdminAnnouncementsPage } from '@features/AdminAnnouncements/views/pages/AdminAnnouncements.page';
+import { AdminAnnouncementsPage } from '@features/AdminAnnouncements/pages/AdminAnnouncements.page';
 
 export default AdminAnnouncementsPage;

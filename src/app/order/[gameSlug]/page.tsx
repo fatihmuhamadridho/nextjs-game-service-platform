@@ -1,4 +1,4 @@
-import { OrderPaymentPage } from '@features/Checkout/views/pages/OrderPayment.page';
+import { OrderPaymentPage } from '@features/Checkout/pages/OrderPayment.page';
 import { redirect } from 'next/navigation';
 
 export default async function OrderRoute({ params }: PageProps<'/order/[gameSlug]'>) {

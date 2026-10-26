@@ -1,3 +1,3 @@
-import { GamesPage } from '@features/Games/views/pages/Games.page';
+import { GamesPage } from '@features/Games/pages/Games.page';
 
 export default GamesPage;

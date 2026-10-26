@@ -1,3 +1,3 @@
-import { AdminAccountsRolesPage } from '@features/AdminAccountsRoles/views/pages/AdminAccountsRoles.page';
+import { AdminAccountsRolesPage } from '@features/AdminAccountsRoles/pages/AdminAccountsRoles.page';
 
 export default AdminAccountsRolesPage;

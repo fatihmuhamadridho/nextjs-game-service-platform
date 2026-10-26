@@ -1,3 +1,3 @@
-import { AboutPage } from '@features/About/views/pages/About.page';
+import { AboutPage } from '@features/About/pages/About.page';
 
 export default AboutPage;

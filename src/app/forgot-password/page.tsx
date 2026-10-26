@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { ForgotPasswordPage } from '@features/Auth/views/pages/ForgotPassword.page';
+import { ForgotPasswordPage } from '@features/Auth/pages/ForgotPassword.page';
 import { notFound } from 'next/navigation';
 import { FEATURE_PASSWORD_RECOVERY } from '@configs/base.config';
 

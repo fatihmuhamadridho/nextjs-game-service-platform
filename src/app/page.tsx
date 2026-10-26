@@ -1,3 +1,3 @@
-import { HomeV2Page } from '@features/HomeV2/views/pages/HomeV2.page';
+import { HomePage } from '@features/Home/pages/Home.page';
 
-export default HomeV2Page;
+export default HomePage;
