@@ -7,7 +7,7 @@ import { IconEye, IconEyeOff, IconLock, IconUser } from '@tabler/icons-react';
 import styles from '../templates/Auth.module.css';
 import { AuthSubmit } from '../atoms/AuthSubmit.atom';
 import { useRouter } from 'next/navigation';
-import { FEATURE_PASSWORD_RECOVERY } from '@configs/base.config';
+import { sessionEstablishedEvent, setSessionType } from '@utils/brandStorage';
 
 export function LoginForm() {
   const [busy, setBusy] = useState(false);
@@ -20,8 +20,9 @@ export function LoginForm() {
     setBusy(true);
     const form = new FormData(event.currentTarget);
     const identifier = String(form.get('identifier') ?? '').trim();
+    const query = new URLSearchParams(window.location.search);
     try {
-      const response = await apiFetch('/api/auth/v1/login', {
+      const response = await apiFetch('/api/admin/auth/v1/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ identifier, password: String(form.get('password') ?? '') }),
@@ -32,18 +33,20 @@ export function LoginForm() {
         setNotice(
           retryAfter
             ? `Terlalu banyak percobaan. Coba lagi dalam ${retryAfter} detik.`
-            : (result.status?.message ?? 'Terlalu banyak percobaan. Coba lagi setelah jeda.')
+            : (result.message ?? 'Terlalu banyak percobaan. Coba lagi setelah jeda.')
         );
         return;
       }
-      if (!response.ok) throw new Error(result.status?.message ?? 'Email/username atau password salah.');
-      const accountType = result.data?.accountType === 'ADMIN' ? 'ADMIN' : 'CUSTOMER';
-      window.sessionStorage.setItem('jokihub-session-type', accountType);
-      window.localStorage.setItem('jokihub-session-type', accountType);
-      window.dispatchEvent(new CustomEvent('jokihub:session-established', { detail: accountType }));
-      router.replace(accountType === 'ADMIN' ? '/admin' : '/');
-    } catch {
-      setNotice('Username/email atau password salah, atau layanan sedang tidak tersedia.');
+      if (!response.ok) throw new Error(result.message ?? 'Email/username atau password salah.');
+      if (result.data?.accountType !== 'ADMIN') {
+        throw new Error('Login pelanggan belum tersedia.');
+      }
+      const accountType = 'ADMIN';
+      setSessionType(accountType);
+      window.dispatchEvent(new CustomEvent(sessionEstablishedEvent, { detail: accountType }));
+      router.replace(query.get('next')?.startsWith('/admin') ? query.get('next')! : '/admin');
+    } catch (cause) {
+      setNotice(cause instanceof Error ? cause.message : 'Username/email atau password salah, atau layanan sedang tidak tersedia.');
     } finally {
       setBusy(false);
     }
@@ -85,11 +88,6 @@ export function LoginForm() {
             </button>
           </span>
         </label>
-        {FEATURE_PASSWORD_RECOVERY && (
-          <button type="button" className={styles.forgot} onClick={() => router.push('/forgot-password')}>
-            Lupa password?
-          </button>
-        )}
         <AuthSubmit disabled={busy}>{busy ? 'Memeriksa…' : 'Masuk'}</AuthSubmit>
         {notice && (
           <p className={styles.notice} role="status">

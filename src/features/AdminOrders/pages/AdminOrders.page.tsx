@@ -28,7 +28,7 @@ export const AdminOrdersPage = () => {
       });
       const response = await apiFetch(`/api/admin/orders/v1/list?${params}`, { cache: 'no-store' });
       const payload = await response.json();
-      if (!response.ok) throw new Error(payload.status?.message ?? 'Gagal memuat pesanan.');
+      if (!response.ok) throw new Error(payload.message ?? 'Gagal memuat pesanan.');
       setOrders(payload.data.orders as ApiOrder[]);
       setError('');
     } catch (cause) {
@@ -45,7 +45,7 @@ export const AdminOrdersPage = () => {
     try {
       const response = await apiFetch(`/api/admin/orders/v1/detail/${order.internalId}`, { cache: 'no-store' });
       const payload = await response.json();
-      if (!response.ok) throw new Error(payload.status?.message ?? 'Gagal memuat detail pesanan.');
+      if (!response.ok) throw new Error(payload.message ?? 'Gagal memuat detail pesanan.');
       const detail = payload.data.order;
       const first = detail.items?.[0];
       setDetailOrder({
@@ -68,14 +68,14 @@ export const AdminOrdersPage = () => {
       body: JSON.stringify({ orderId: detailOrder.internalId, paymentId, decision, note }),
     });
     const payload = await response.json();
-    if (!response.ok) throw new Error(payload.status?.message ?? 'Pemeriksaan pembayaran gagal disimpan.');
+    if (!response.ok) throw new Error(payload.message ?? 'Pemeriksaan pembayaran gagal disimpan.');
     setDetailOrder(null);
     await load();
   };
   const completeOrder = async (orderId: string) => {
     const response = await apiFetch(`/api/admin/orders/v1/complete/${encodeURIComponent(orderId)}`, { method: 'POST' });
     const payload = await response.json();
-    if (!response.ok) throw new Error(payload.status?.message ?? 'Status pesanan gagal diperbarui.');
+    if (!response.ok) throw new Error(payload.message ?? 'Status pesanan gagal diperbarui.');
     setDetailOrder(null);
     await load();
   };

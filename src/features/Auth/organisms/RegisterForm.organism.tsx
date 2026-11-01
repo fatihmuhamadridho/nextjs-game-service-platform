@@ -5,6 +5,7 @@ import { apiFetch } from '@services/apiFetch.service';
 import { useState, type FormEvent } from 'react';
 import { IconEye, IconEyeOff, IconLock, IconMail, IconUser } from '@tabler/icons-react';
 import styles from '../templates/Auth.module.css';
+import { sessionEstablishedEvent, setSessionType } from '@utils/brandStorage';
 import { AuthSubmit } from '../atoms/AuthSubmit.atom';
 import { useRouter } from 'next/navigation';
 
@@ -43,8 +44,8 @@ export function RegisterForm() {
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.status?.message ?? 'Pendaftaran gagal.');
-      window.sessionStorage.setItem('jokihub-session-type', 'CUSTOMER');
-      window.dispatchEvent(new CustomEvent('jokihub:session-established', { detail: 'CUSTOMER' }));
+      setSessionType('CUSTOMER');
+      window.dispatchEvent(new CustomEvent(sessionEstablishedEvent, { detail: 'CUSTOMER' }));
       router.replace('/');
     } catch (cause) {
       setNotice(cause instanceof Error ? cause.message : 'Layanan pendaftaran sedang tidak tersedia.');
@@ -132,7 +133,7 @@ export function RegisterForm() {
           <input type="checkbox" required />
           <span>
             Saya menyetujui <a href="/bantuan#syarat">Syarat & Ketentuan</a> dan{' '}
-            <a href="/bantuan#privasi">Kebijakan Privasi</a> JokiHub
+            <a href="/bantuan#privasi">Kebijakan Privasi</a> bongastore
           </span>
         </label>
         <AuthSubmit disabled={busy}>{busy ? 'Membuat akun…' : 'Daftar Sekarang'}</AuthSubmit>

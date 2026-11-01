@@ -264,7 +264,7 @@ export const AdminServiceCategoriesTemplate = ({
                 Deskripsi
                 <textarea
                   rows={3}
-                  value={form.description}
+                  value={form.description ?? ''}
                   onChange={(event: ChangeEvent<HTMLTextAreaElement>) => updateField('description', event.target.value)}
                   placeholder="Jelaskan jenis layanan dalam kategori ini"
                 />

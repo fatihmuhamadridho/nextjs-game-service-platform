@@ -18,6 +18,8 @@ type Props = {
   loading: boolean;
   submitting: boolean;
   apiMessage: string;
+  catalogError: string;
+  onRetryCatalog: () => void;
   paymentMethod: string;
   onPaymentMethod: (method: string) => void;
   errors: string[];
@@ -39,6 +41,8 @@ export const CheckoutTemplate = ({
   loading,
   submitting,
   apiMessage,
+  catalogError,
+  onRetryCatalog,
   paymentMethod,
   onPaymentMethod,
   errors,
@@ -54,17 +58,41 @@ export const CheckoutTemplate = ({
   return (
     <main className={styles.page}>
       <CheckoutHeader game={selectedGame || 'Game'} stage="selection" />
-      <div className={styles.layout}>
+      <div className={styles.layout} aria-busy={loading}>
         {apiMessage && <p role="alert">{apiMessage}</p>}
-        {loading && <p role="status">Memuat katalog game dan layanan…</p>}
-        <div className={styles.formColumn}>
-          <GamePicker games={games} selected={selectedGame} onSelect={onGameSelect} />
-          <ServicePicker
-            services={services}
-            selected={selectedService}
-            formatPrice={formatPrice}
-            onSelect={onServiceSelect}
-          />
+        {loading && (
+          <span className={styles.srOnly} role="status">
+            Memuat katalog game dan layanan…
+          </span>
+        )}
+        <div className={styles.formColumn} aria-busy={loading}>
+          {catalogError && (
+            <div className={styles.catalogError}>
+              <p role="alert">{catalogError}</p>
+              <button type="button" onClick={onRetryCatalog} disabled={loading}>
+                {loading ? 'Memuat ulang…' : 'Coba lagi'}
+              </button>
+            </div>
+          )}
+          {!(catalogError && games.length === 0) && (
+            <>
+              <GamePicker
+                games={games}
+                selected={selectedGame}
+                onSelect={onGameSelect}
+                loading={loading && games.length === 0}
+              />
+              {!catalogError && (
+                <ServicePicker
+                  services={services}
+                  selected={selectedService}
+                  formatPrice={formatPrice}
+                  onSelect={onServiceSelect}
+                  loading={loading}
+                />
+              )}
+            </>
+          )}
           <OrderDetailsForm errors={errors} onChange={onDetailsChange} />
         </div>
         <aside className={styles.summaryColumn}>

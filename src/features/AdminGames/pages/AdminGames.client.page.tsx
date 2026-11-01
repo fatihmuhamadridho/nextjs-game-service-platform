@@ -10,7 +10,7 @@ const emptyForm: AdminGameForm = {
   name: '',
   slug: '',
   serviceSummary: '',
-  artworkKey: '',
+  imageUrl: '',
   active: false,
   popular: false,
   sortOrder: 0,
@@ -46,13 +46,37 @@ export const AdminGamesClientPage = () => {
     try {
       const response = await apiFetch('/api/admin/games/v1/list', { cache: 'no-store' });
       const result = await response.json();
-      if (!response.ok) throw new Error(result.status?.message ?? 'Data game gagal dimuat.');
-      const games = (result.data?.games ?? []) as AdminGameView[];
+      if (!response.ok) throw new Error(result.message ?? 'Data game gagal dimuat.');
+      const apiGames = Array.isArray(result.data) ? result.data : (result.data?.games ?? []);
       setGames(
-        games.map((game) => ({
-          ...game,
-          updatedAt: dateFormatter.format(new Date(game.updatedAt)),
-        }))
+        apiGames.map(
+          (game: {
+            id: string;
+            name: string;
+            slug: string;
+            description?: string | null;
+            serviceSummary?: string | null;
+            imageUrl?: string | null;
+            serviceCount?: number;
+            isActive?: boolean;
+            active?: boolean;
+            isPopular?: boolean;
+            popular?: boolean;
+            sortOrder: number;
+            updatedAt?: string;
+          }) => ({
+            id: game.id,
+            name: game.name,
+            slug: game.slug,
+            serviceSummary: game.serviceSummary ?? game.description ?? null,
+            imageUrl: game.imageUrl ?? '',
+            serviceCount: game.serviceCount ?? 0,
+            active: game.isActive ?? game.active ?? false,
+            popular: game.isPopular ?? game.popular ?? false,
+            sortOrder: game.sortOrder,
+            updatedAt: game.updatedAt ? dateFormatter.format(new Date(game.updatedAt)) : '—',
+          })
+        )
       );
     } catch (error) {
       setLoadError(error instanceof Error ? error.message : 'Data game gagal dimuat.');
@@ -90,7 +114,7 @@ export const AdminGamesClientPage = () => {
       name: game.name,
       slug: game.slug,
       serviceSummary: game.serviceSummary ?? '',
-      artworkKey: game.artworkKey ?? '',
+      imageUrl: game.imageUrl,
       active: game.active,
       popular: game.popular,
       sortOrder: game.sortOrder,
@@ -116,8 +140,8 @@ export const AdminGamesClientPage = () => {
           body: JSON.stringify({
             name: nextGame.name,
             slug: nextGame.slug,
-            serviceSummary: nextGame.serviceSummary || null,
-            artworkKey: nextGame.artworkKey || null,
+            description: nextGame.serviceSummary || null,
+            imageUrl: nextGame.imageUrl,
             isActive: nextGame.active,
             isPopular: nextGame.popular,
             sortOrder: nextGame.sortOrder,
@@ -125,7 +149,7 @@ export const AdminGamesClientPage = () => {
         }
       );
       const result = await response.json();
-      if (!response.ok) throw new Error(result.status?.message ?? 'Perubahan tidak dapat disimpan.');
+      if (!response.ok) throw new Error(result.message ?? 'Perubahan tidak dapat disimpan.');
       setFormMode(null);
       await loadGames();
     } catch (error) {
@@ -143,7 +167,7 @@ export const AdminGamesClientPage = () => {
         method: 'DELETE',
       });
       const result = await response.json();
-      if (!response.ok) throw new Error(result.status?.message ?? 'Game tidak dapat dihapus.');
+      if (!response.ok) throw new Error(result.message ?? 'Game tidak dapat dihapus.');
       setDeleteTarget(null);
       await loadGames();
     } catch (error) {

@@ -4,10 +4,11 @@ import { apiFetch } from '@services/apiFetch.service';
 
 import { useEffect, useState, type FormEvent } from 'react';
 import type { AdminSettingsForm } from '../interfaces/admin-settings.interface';
+import { withCurrentBrandName } from '@utils/display-brand';
 import { AdminSettingsTemplate } from '../templates/AdminSettings.template';
 
 const initialSettings: AdminSettingsForm = {
-  siteName: 'JokiHub',
+  siteName: 'bongastore',
   siteDescription: 'Solusi top up game, joki, dan kebutuhan digital.',
   contactEmail: '',
   contactWhatsapp: '',
@@ -29,12 +30,18 @@ export const AdminSettingsPage = () => {
       try {
         const response = await apiFetch('/api/admin/settings/v1/general', { cache: 'no-store' });
         const payload = await response.json();
-        if (!response.ok) throw new Error(payload.status?.message ?? 'Gagal memuat pengaturan.');
+        if (!response.ok) throw new Error(payload.message ?? 'Gagal memuat pengaturan.');
         const value = payload.data.settings;
         setSettings({
           ...value,
-          siteDescription: value.siteDescription ?? '',
-          socialLinks: value.socialLinks ?? [],
+          siteName: 'bongastore',
+          siteDescription: withCurrentBrandName(value.siteDescription ?? ''),
+          contactEmail: value.contactEmail ?? '',
+          contactWhatsapp: value.contactWhatsapp ?? '',
+          socialLinks: (value.socialLinks ?? []).map((link: { label: string; url: string }) => ({
+            ...link,
+            label: withCurrentBrandName(link.label),
+          })),
           businessHours: value.businessHours ?? '',
         });
       } catch (cause) {
@@ -58,12 +65,18 @@ export const AdminSettingsPage = () => {
         }),
       });
       const payload = await response.json();
-      if (!response.ok) throw new Error(payload.status?.message ?? 'Gagal menyimpan pengaturan.');
+      if (!response.ok) throw new Error(payload.message ?? 'Gagal menyimpan pengaturan.');
       setSaved(true);
       setSettings({
         ...payload.data.settings,
-        siteDescription: payload.data.settings.siteDescription ?? '',
-        socialLinks: payload.data.settings.socialLinks ?? [],
+        siteName: 'bongastore',
+        siteDescription: withCurrentBrandName(payload.data.settings.siteDescription ?? ''),
+        contactEmail: payload.data.settings.contactEmail ?? '',
+        contactWhatsapp: payload.data.settings.contactWhatsapp ?? '',
+        socialLinks: (payload.data.settings.socialLinks ?? []).map((link: { label: string; url: string }) => ({
+          ...link,
+          label: withCurrentBrandName(link.label),
+        })),
         businessHours: payload.data.settings.businessHours ?? '',
       });
       window.setTimeout(() => setSaved(false), 3000);

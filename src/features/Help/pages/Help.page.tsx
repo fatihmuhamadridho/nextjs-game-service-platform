@@ -174,7 +174,7 @@ export const HelpPage = () => {
         <section className={styles.hero}>
           <div className={styles.heroCopy}>
             <h1>
-              Pusat Bantuan <span>JokiHub</span>
+              Pusat Bantuan <span>bongastore</span>
             </h1>
             <p>
               Temukan jawaban untuk pertanyaan kamu seputar pemesanan, pembayaran, proses pengerjaan, dan layanan
@@ -237,7 +237,7 @@ export const HelpPage = () => {
             <div className={styles.sectionHeading}>
               <div>
                 <h2>Artikel Populer</h2>
-                <p>Artikel yang paling sering dicari oleh pengguna JokiHub.</p>
+                <p>Artikel yang paling sering dicari oleh pengguna bongastore.</p>
               </div>
               <a href="#artikel">
                 Lihat Semua <IconArrowRight />

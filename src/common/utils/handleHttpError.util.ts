@@ -16,6 +16,7 @@ type HttpErrorLike = {
     statusText?: string;
     data?: {
       code?: string;
+      message?: string;
       status?: {
         code?: string;
         message?: string;
@@ -41,7 +42,7 @@ export function handleHttpError(
   const codeKey =
     error?.cause?.code ?? error?.response?.data?.code ?? error?.response?.data?.status?.code ?? error?.code;
   const codeMessage = codeKey ? options?.codeMessages?.[codeKey] : undefined;
-  const responseStatusMessage = error?.response?.data?.status?.message;
+  const responseStatusMessage = error?.response?.data?.message ?? error?.response?.data?.status?.message;
 
   const messageMapper =
     statusMessage ??

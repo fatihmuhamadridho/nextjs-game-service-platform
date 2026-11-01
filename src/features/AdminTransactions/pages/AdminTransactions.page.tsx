@@ -32,7 +32,7 @@ export const AdminTransactionsPage = () => {
       });
       const response = await apiFetch(`/api/admin/transactions/v1/list?${params}`, { cache: 'no-store' });
       const payload = await response.json();
-      if (!response.ok) throw new Error(payload.status?.message ?? 'Gagal memuat transaksi.');
+      if (!response.ok) throw new Error(payload.message ?? 'Gagal memuat transaksi.');
       setTransactions(payload.data.transactions as TransactionView[]);
       setTotalCount(payload.data.total);
       setError('');
@@ -49,7 +49,7 @@ export const AdminTransactionsPage = () => {
         cache: 'no-store',
       });
       const payload = await response.json();
-      if (!response.ok) throw new Error(payload.status?.message ?? 'Gagal memuat detail transaksi.');
+      if (!response.ok) throw new Error(payload.message ?? 'Gagal memuat detail transaksi.');
       setDetailTarget(payload.data.transaction as TransactionView);
       setError('');
     } catch (cause) {

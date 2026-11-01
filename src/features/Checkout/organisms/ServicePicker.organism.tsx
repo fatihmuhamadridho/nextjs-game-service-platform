@@ -8,20 +8,34 @@ type Props = {
   selected: number;
   formatPrice: (value: number) => string;
   onSelect: (index: number) => void;
+  loading?: boolean;
 };
-export const ServicePicker = ({ services, selected, formatPrice, onSelect }: Props) => (
+export const ServicePicker = ({ services, selected, formatPrice, onSelect, loading = false }: Props) => (
   <Box className={styles.panel} bordered rounded>
     <PanelHeading number="2" title="Pilih Layanan" description="Pilih layanan joki yang kamu butuhkan." />
-    <div className={styles.list} role="radiogroup" aria-label="Pilih layanan">
-      {services.map((service, index) => (
-        <ServiceOption
-          key={service.name}
-          service={service}
-          selected={selected === index}
-          priceLabel={service.price ? formatPrice(service.price) : ''}
-          onSelect={() => onSelect(index)}
-        />
-      ))}
+    <div
+      className={styles.list}
+      role={loading ? undefined : 'radiogroup'}
+      aria-label={loading ? undefined : 'Pilih layanan'}
+      aria-busy={loading}
+    >
+      {loading
+        ? Array.from({ length: 3 }, (_, index) => (
+            <div className={styles.skeletonRow} key={index} aria-hidden="true">
+              <span />
+              <i />
+              <b />
+            </div>
+          ))
+        : services.map((service, index) => (
+            <ServiceOption
+              key={service.name}
+              service={service}
+              selected={selected === index}
+              priceLabel={service.price ? formatPrice(service.price) : ''}
+              onSelect={() => onSelect(index)}
+            />
+          ))}
     </div>
   </Box>
 );

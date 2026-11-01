@@ -74,7 +74,7 @@ export const AdminPagesTemplate = ({
               Dashboard <span>/</span> Konten <span>/</span> <b>Halaman</b>
             </p>
             <h1>Kelola Halaman</h1>
-            <p>Atur halaman informasi dan kebijakan yang tersedia di JokiHub.</p>
+            <p>Atur halaman informasi dan kebijakan yang tersedia di bongastore.</p>
           </div>
           <button className={styles.createButton} onClick={onCreate}>
             <IconPlus /> Buat Halaman
@@ -188,7 +188,7 @@ export const AdminPagesTemplate = ({
               </div>
             )}
           </div>
-          <p className={styles.demoNote}>Data contoh. Perubahan hanya tersimpan selama halaman ini terbuka.</p>
+          <p className={styles.demoNote}>Data contoh berasal dari API; masa simpannya mengikuti layanan backend.</p>
         </Box>
       </div>
       {formMode && (
@@ -214,7 +214,7 @@ export const AdminPagesTemplate = ({
                 <input
                   required
                   autoFocus
-                  value={form.title}
+                  value={form.title ?? ''}
                   onChange={(event: ChangeEvent<HTMLInputElement>) => {
                     updateField('title', event.target.value);
                     if (!form.slug || formMode === 'create') updateField('slug', slugify(event.target.value));
@@ -226,7 +226,7 @@ export const AdminPagesTemplate = ({
                 Slug
                 <input
                   required
-                  value={form.slug}
+                  value={form.slug ?? ''}
                   onChange={(event: ChangeEvent<HTMLInputElement>) => updateField('slug', slugify(event.target.value))}
                   placeholder="tentang-kami"
                 />
@@ -236,7 +236,7 @@ export const AdminPagesTemplate = ({
                 Ringkasan
                 <input
                   required
-                  value={form.summary}
+                  value={form.summary ?? ''}
                   onChange={(event: ChangeEvent<HTMLInputElement>) => updateField('summary', event.target.value)}
                   placeholder="Ringkasan singkat halaman"
                 />
@@ -246,7 +246,7 @@ export const AdminPagesTemplate = ({
                 <textarea
                   required
                   rows={7}
-                  value={form.content}
+                  value={form.content ?? ''}
                   onChange={(event: ChangeEvent<HTMLTextAreaElement>) => updateField('content', event.target.value)}
                   placeholder="Tulis isi halaman..."
                 />

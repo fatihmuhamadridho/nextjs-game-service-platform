@@ -19,12 +19,29 @@ export const GamesPage = () => {
 
   useEffect(() => {
     let alive = true;
-    const query = new URLSearchParams({
-      search,
-      limit: '100',
-      offset: '0',
-      sort: sort === 'Nama A–Z' ? 'NAME_ASC' : 'POPULAR',
-    });
+    void apiFetch('/api/service-categories/v1/list', { cache: 'no-store' })
+      .then(async (response) => {
+        const result = await response.json();
+        if (!response.ok || !result.data) throw new Error(result.message ?? 'Kategori gagal dimuat.');
+        const categoryList = Array.isArray(result.data) ? result.data : (result.data.categories ?? []);
+        if (alive)
+          setServiceCategories(
+            categoryList.map((category: { name: string; slug: string; count?: number; gameCount?: number }) => ({
+              name: category.name,
+              slug: category.slug,
+              count: category.gameCount ?? category.count ?? 0,
+            }))
+          );
+      })
+      .catch(() => alive && setServiceCategories([]));
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let alive = true;
+    const query = new URLSearchParams({ search, limit: '100', page: '1', sort: sort === 'Nama A–Z' ? 'NAME_ASC' : 'POPULAR' });
 
     if (activeCategorySlug) query.set('category', activeCategorySlug);
 
@@ -32,42 +49,47 @@ export const GamesPage = () => {
       .then(async (response) => {
         const result = await response.json();
 
-        if (!response.ok || !result.data) throw new Error(result.status?.message ?? 'Katalog game gagal dimuat.');
+        if (!response.ok || !result.data) throw new Error(result.message ?? 'Katalog game gagal dimuat.');
         if (!alive) return;
 
-        const totalItems: number = result.data.pagination.total;
-        const allGames = [...result.data.games];
+        const firstPageGames = Array.isArray(result.data) ? result.data : result.data.games;
+        const pagination = result.pagination ?? result.data.pagination;
+        const totalItems: number = pagination?.total ?? firstPageGames.length;
+        const allGames = [...firstPageGames];
+        const totalPages: number = pagination?.totalPages ?? 1;
 
-        while (allGames.length < totalItems) {
+        for (let nextPageNumber = 2; nextPageNumber <= totalPages; nextPageNumber += 1) {
           const nextQuery = new URLSearchParams(query);
-          nextQuery.set('offset', String(allGames.length));
+          nextQuery.set('page', String(nextPageNumber));
           const nextResponse = await apiFetch(`/api/games/v1/list?${nextQuery}`);
           const nextResult = await nextResponse.json();
           if (!nextResponse.ok || !nextResult.data) {
-            throw new Error(nextResult.status?.message ?? 'Katalog game gagal dimuat.');
+            throw new Error(nextResult.message ?? 'Katalog game gagal dimuat.');
           }
-          if (!nextResult.data.games.length) break;
-          allGames.push(...nextResult.data.games);
+          const nextGames = Array.isArray(nextResult.data) ? nextResult.data : nextResult.data.games;
+          if (!nextGames.length) break;
+          allGames.push(...nextGames);
         }
 
         if (!alive) return;
 
         setTotal(totalItems);
-        setServiceCategories(result.data.filters?.serviceCategories ?? []);
         setGames(
           allGames.map(
             (game: {
               id: string;
               slug: string;
               name: string;
-              artworkKey: string | null;
+              artworkKey?: string | null;
+              imageUrl?: string | null;
               serviceCount: number;
               categories?: Array<{ name: string }>;
+              description?: string | null;
             }) => ({
               id: game.id,
               slug: game.slug,
               name: game.name,
-              art: game.artworkKey ?? game.slug,
+              art: game.artworkKey ?? game.imageUrl ?? game.slug,
               tags: game.categories?.map((category) => category.name) ?? [],
               count: game.serviceCount,
               rating: '',

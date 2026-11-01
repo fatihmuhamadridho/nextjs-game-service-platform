@@ -12,8 +12,8 @@ import { AdminAnnouncementsTemplate } from '../templates/AdminAnnouncements.temp
 const seedAnnouncements: AdminAnnouncementView[] = [
   {
     id: 'announcement-1',
-    title: 'Informasi Layanan JokiHub',
-    content: 'Informasi umum layanan JokiHub untuk pengguna.',
+    title: 'Informasi Layanan bongastore',
+    content: 'Informasi umum layanan bongastore untuk pengguna.',
     type: 'Informasi',
     audience: 'Semua Pengguna',
     status: 'Terbit',

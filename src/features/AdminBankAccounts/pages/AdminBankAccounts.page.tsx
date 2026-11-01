@@ -1,6 +1,8 @@
 'use client';
 
-import { useMemo, useState, type FormEvent } from 'react';
+import { apiFetch } from '@services/apiFetch.service';
+
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 import type {
   BankAccountForm,
   BankAccountStatusFilter,
@@ -8,38 +10,6 @@ import type {
 } from '../interfaces/admin-bank-account.interface';
 import { AdminBankAccountsTemplate } from '../templates/AdminBankAccounts.template';
 
-const seedAccounts: BankAccountView[] = [
-  {
-    id: 'bank-1',
-    bankName: 'BCA',
-    accountNumber: '•••• •••• 4821',
-    accountHolder: 'PT JokiHub Indonesia',
-    label: 'Rekening operasional',
-    status: 'Aktif',
-    isPrimary: true,
-    updatedAt: '11 Okt 2026',
-  },
-  {
-    id: 'bank-2',
-    bankName: 'Mandiri',
-    accountNumber: '•••• •••• 1732',
-    accountHolder: 'PT JokiHub Indonesia',
-    label: 'Rekening cadangan',
-    status: 'Aktif',
-    isPrimary: false,
-    updatedAt: '10 Okt 2026',
-  },
-  {
-    id: 'bank-3',
-    bankName: 'BNI',
-    accountNumber: '•••• •••• 9255',
-    accountHolder: 'JokiHub Digital',
-    label: 'Rekening lama',
-    status: 'Nonaktif',
-    isPrimary: false,
-    updatedAt: '8 Okt 2026',
-  },
-];
 const emptyForm: BankAccountForm = {
   bankName: 'BCA',
   accountNumber: '',
@@ -50,13 +20,34 @@ const emptyForm: BankAccountForm = {
 };
 
 export const AdminBankAccountsPage = () => {
-  const [accounts, setAccounts] = useState(seedAccounts);
+  const [accounts, setAccounts] = useState<BankAccountView[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [query, setQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<BankAccountStatusFilter>('Semua Status');
   const [formMode, setFormMode] = useState<'create' | 'edit' | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<BankAccountForm>(emptyForm);
   const [deleteTarget, setDeleteTarget] = useState<BankAccountView | null>(null);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await apiFetch('/api/admin/bank-accounts/v1/list', { cache: 'no-store' });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.message ?? 'Gagal memuat rekening.');
+      setAccounts(payload.data?.bankAccounts ?? []);
+      setError('');
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Gagal memuat rekening.');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+  useEffect(() => {
+    void Promise.resolve().then(load);
+  }, [load]);
+
   const filteredAccounts = useMemo(
     () =>
       accounts.filter(
@@ -85,29 +76,61 @@ export const AdminBankAccountsPage = () => {
     });
     setFormMode('edit');
   };
-  const handleSave = (event: FormEvent<HTMLFormElement>) => {
+  const handleSave = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const next = {
+    setError('');
+    const payload = {
       ...form,
       accountNumber: form.accountNumber.trim(),
       accountHolder: form.accountHolder.trim(),
       label: form.label.trim(),
-      updatedAt: 'Baru saja',
     };
-    setAccounts((current) =>
-      current
-        .map((account) => ({ ...account, isPrimary: next.isPrimary ? false : account.isPrimary }))
-        .map((account) => (formMode === 'edit' && account.id === editingId ? { ...account, ...next } : account))
-    );
-    if (formMode === 'create') setAccounts((current) => [{ id: `bank-${Date.now()}`, ...next }, ...current]);
-    setFormMode(null);
+    try {
+      const response = await apiFetch(
+        formMode === 'edit' && editingId
+          ? `/api/admin/bank-accounts/v1/update/${encodeURIComponent(editingId)}`
+          : '/api/admin/bank-accounts/v1/create',
+        {
+          method: formMode === 'edit' ? 'PATCH' : 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(payload),
+        }
+      );
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.message ?? 'Gagal menyimpan rekening.');
+      setFormMode(null);
+      await load();
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Gagal menyimpan rekening.');
+    }
   };
-  const makePrimary = (id: string) =>
-    setAccounts((current) => current.map((account) => ({ ...account, isPrimary: account.id === id })));
-  const confirmDelete = () => {
+  const makePrimary = async (id: string) => {
+    setError('');
+    try {
+      const response = await apiFetch(`/api/admin/bank-accounts/v1/set-primary/${encodeURIComponent(id)}`, {
+        method: 'POST',
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.message ?? 'Gagal mengubah rekening utama.');
+      await load();
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Gagal mengubah rekening utama.');
+    }
+  };
+  const confirmDelete = async () => {
     if (!deleteTarget) return;
-    setAccounts((current) => current.filter((account) => account.id !== deleteTarget.id));
-    setDeleteTarget(null);
+    setError('');
+    try {
+      const response = await apiFetch(`/api/admin/bank-accounts/v1/delete/${encodeURIComponent(deleteTarget.id)}`, {
+        method: 'DELETE',
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.message ?? 'Gagal menghapus rekening.');
+      setDeleteTarget(null);
+      await load();
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Gagal menghapus rekening.');
+    }
   };
   return (
     <AdminBankAccountsTemplate
@@ -128,6 +151,8 @@ export const AdminBankAccountsPage = () => {
       deleteTarget={deleteTarget}
       onDeleteSelect={setDeleteTarget}
       onDeleteConfirm={confirmDelete}
+      loading={loading}
+      error={error}
     />
   );
 };

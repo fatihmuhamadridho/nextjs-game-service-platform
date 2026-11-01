@@ -3,7 +3,7 @@ export type AdminGameView = {
   name: string;
   slug: string;
   serviceSummary: string | null;
-  artworkKey: string | null;
+  imageUrl: string;
   serviceCount: number;
   active: boolean;
   popular: boolean;
@@ -13,7 +13,7 @@ export type AdminGameView = {
 
 export type AdminGameForm = Pick<
   AdminGameView,
-  'name' | 'slug' | 'serviceSummary' | 'artworkKey' | 'active' | 'popular' | 'sortOrder'
+  'name' | 'slug' | 'serviceSummary' | 'imageUrl' | 'active' | 'popular' | 'sortOrder'
 >;
 export type AdminGameStatusFilter = 'Semua' | 'Aktif' | 'Nonaktif';
 export type AdminGameFormMode = 'create' | 'edit' | null;

@@ -1,3 +1,5 @@
-import { AdminFaqsPage } from '@features/AdminFaqs/pages/AdminFaqs.page';
+import { redirect } from 'next/navigation';
 
-export default AdminFaqsPage;
+export default function Page() {
+  redirect('/admin');
+}

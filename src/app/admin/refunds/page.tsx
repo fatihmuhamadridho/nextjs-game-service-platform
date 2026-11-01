@@ -1,3 +1,5 @@
-import { AdminRefundsPage } from '@features/AdminRefunds/pages/AdminRefunds.page';
+import { redirect } from 'next/navigation';
 
-export default AdminRefundsPage;
+export default function Page() {
+  redirect('/admin');
+}

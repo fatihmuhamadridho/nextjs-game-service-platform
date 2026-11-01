@@ -1,10 +1,10 @@
-# JokiHub — Design Specification
+# Bongastore — Design Specification
 
 > Status: Draft · Version: 1.0 · Based on the approved dark-mode wireframes (landing and order/checkout, desktop and mobile).
 
 ## 1. Product overview
 
-JokiHub is a responsive gaming-services storefront for browsing games, selecting digital services (e.g., joki/rank boosting and top-ups), and placing orders. The experience should feel fast, trustworthy, easy to scan, and mobile-first.
+Bongastore is a responsive gaming-services storefront for browsing games, selecting digital services (e.g., joki/rank boosting and top-ups), and placing orders. The experience should feel fast, trustworthy, easy to scan, and mobile-first.
 
 **Primary user flow:** Landing → Select game/service → Configure order → Enter account/contact details → Review summary → Select payment method → Submit order / receive instructions.
 
@@ -105,7 +105,7 @@ Breakpoints: mobile `< 640px`, tablet `640–1023px`, desktop `≥ 1024px`. Avoi
 
 ### 4.1 Header — desktop
 
-- Logo on the left: gamepad icon + **JokiHub** (blue accent).
+- Logo on the left: gamepad icon + **Bongastore** (blue accent).
 - Nav links: **Beranda**, **Layanan** (dropdown), **Cek Pesanan**, **Bantuan**.
 - Search field: `Cari game atau layanan...`.
 - Right side: **Masuk / Daftar** when signed out; avatar when signed in.
@@ -122,7 +122,7 @@ Breakpoints: mobile `< 640px`, tablet `640–1023px`, desktop `≥ 1024px`. Avoi
 
 Full-width footer separated by top border; five logical areas:
 
-1. **Brand:** JokiHub logo, short description, social icons.
+1. **Brand:** Bongastore logo, short description, social icons.
 2. **Quick Links:** Beranda, Layanan, Cek Pesanan, Bantuan, Tentang Kami.
 3. **Layanan:** Top Up Game, Joki Game, Voucher Game, Pulsa & Paket Data, E-Wallet, Lainnya.
 4. **Bantuan:** Pusat Bantuan, Syarat & Ketentuan, Kebijakan Privasi, Hubungi Kami, Status Layanan.
@@ -176,7 +176,7 @@ Every interactive element needs hover (where relevant), keyboard focus, disabled
 - Short message and `Top Up Sekarang` CTA.
 - Optional diamond/gaming illustration.
 
-**E. Kenapa Pilih JokiHub?**
+**E. Kenapa Pilih Bongastore?**
 
 - Four compact benefits: Proses Super Cepat, 100% Aman, Harga Terbaik, Layanan 24/7.
 - Treat these as proposed marketing copy; validate before publishing any absolute claims.
@@ -339,6 +339,6 @@ Suggested stack if building with React: **Next.js App Router + TypeScript + Tail
 ## 11. Source and fidelity notes
 
 - Visual reference supplied by the user: https://joki.dadalisnack.com/joki/
-- Immediate design reference: dark JokiHub wireframe showing **four views** — landing desktop, landing mobile, order desktop, and order mobile.
+- Immediate design reference: dark Bongastore wireframe showing **four views** — landing desktop, landing mobile, order desktop, and order mobile.
 - This document describes **the designed wireframe**, not a verified inventory of the live reference site's current functionality.
 - Exact illustrations, production copy, brand identity, real catalog data, payment methods, and legal/footer contact details should be confirmed before implementation.

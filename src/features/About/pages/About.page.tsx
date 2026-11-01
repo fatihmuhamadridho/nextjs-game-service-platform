@@ -1,3 +1,8 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { apiRequest } from '@services/apiFetch.service';
+import { withCurrentBrandName } from '@utils/display-brand';
 import {
   IconArrowRight,
   IconBolt,
@@ -31,8 +36,34 @@ const values = [
   },
 ];
 
-export const AboutPage = () => (
-  <main className={styles.page}>
+type AboutContent = { title: string; summary: string; content: string };
+
+export const AboutPage = () => {
+  const [about, setAbout] = useState<AboutContent | null>(null);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    let alive = true;
+    void apiRequest<{ page: AboutContent }>('/api/pages/v1/tentang-kami', { cache: 'no-store' })
+      .then((data) => {
+        if (alive) {
+          setAbout({
+            title: withCurrentBrandName(data.page.title),
+            summary: withCurrentBrandName(data.page.summary),
+            content: withCurrentBrandName(data.page.content),
+          });
+        }
+      })
+      .catch((cause: unknown) => {
+        if (alive) setError(cause instanceof Error ? cause.message : 'Informasi halaman belum tersedia.');
+      });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  return (
+    <main className={styles.page}>
     <Header />
     <div className={styles.content}>
       <nav className={styles.breadcrumb} aria-label="Breadcrumb">
@@ -43,17 +74,14 @@ export const AboutPage = () => (
       <section className={styles.hero}>
         <div className={styles.heroCopy}>
           <span className={styles.eyebrow}>
-            <IconSparkles /> Tentang JokiHub
+            <IconSparkles /> {about?.title ?? 'Tentang bongastore'}
           </span>
           <h1>
             Satu tempat untuk
             <br />
             kebutuhan <span>gaming</span> kamu.
           </h1>
-          <p>
-            JokiHub adalah konsep storefront layanan game yang membantu pemain menemukan pilihan top up, joki, voucher,
-            dan kebutuhan digital dalam satu pengalaman.
-          </p>
+          <p role={error ? 'alert' : undefined}>{about?.summary ?? error}</p>
           <Link href="/games" className={styles.primary}>
             Jelajahi Game <IconArrowRight />
           </Link>
@@ -76,15 +104,7 @@ export const AboutPage = () => (
           <h2>Pengalaman gaming yang lebih mudah dimulai dari sini.</h2>
         </div>
         <div className={styles.storyCopy}>
-          <p>
-            Menemukan layanan yang tepat bisa terasa membingungkan. JokiHub dirancang untuk mengumpulkan berbagai
-            kebutuhan gaming dalam tampilan yang ringkas, membantu kamu membandingkan pilihan dan melanjutkan pemesanan
-            dengan lebih mudah.
-          </p>
-          <p>
-            Saat ini JokiHub masih berupa prototipe. Katalog, harga, estimasi, jaminan, dan informasi kontak perlu
-            dikonfirmasi sebelum digunakan sebagai penawaran resmi.
-          </p>
+          <p role={error ? 'alert' : undefined}>{about?.content ?? (error || 'Memuat informasi bongastore…')}</p>
         </div>
       </section>
 
@@ -107,7 +127,7 @@ export const AboutPage = () => (
           <div>
             <span className={styles.sectionLabel}>Prinsip Kami</span>
             <h2>Hal yang kami utamakan</h2>
-            <p>Nilai yang menjadi arah dalam merancang pengalaman JokiHub.</p>
+            <p>Nilai yang menjadi arah dalam merancang pengalaman bongastore.</p>
           </div>
         </div>
         <div className={styles.valueGrid}>
@@ -136,4 +156,5 @@ export const AboutPage = () => (
     </div>
     <Footer />
   </main>
-);
+  );
+};

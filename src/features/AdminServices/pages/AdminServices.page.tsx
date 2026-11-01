@@ -23,10 +23,21 @@ export const AdminServicesPage = () => {
     try {
       const response = await apiFetch('/api/admin/services/v1/list', { cache: 'no-store' });
       const payload = await response.json();
-      if (!response.ok) throw new Error(payload.status?.message ?? 'Gagal memuat layanan.');
-      setServices(payload.data.services);
-      setGames(payload.data.games);
-      setCategories(payload.data.categories);
+      if (!response.ok) throw new Error(payload.message ?? 'Gagal memuat layanan.');
+      setServices(
+        (payload.data.services ?? []).map((service: AdminServiceView) => ({
+          ...service,
+          name: service.name ?? '',
+          game: service.game ?? '',
+          category: service.category ?? '',
+          gameId: service.gameId ?? '',
+          categoryId: service.categoryId ?? '',
+          estimate: service.estimate ?? '',
+          price: service.price ?? null,
+        }))
+      );
+      setGames((payload.data.games ?? []).map((game: Option) => ({ ...game, name: game.name ?? '' })));
+      setCategories((payload.data.categories ?? []).map((category: Option) => ({ ...category, name: category.name ?? '' })));
       setError('');
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Gagal memuat layanan.');
@@ -64,11 +75,11 @@ export const AdminServicesPage = () => {
   const openEdit = (service: AdminServiceView) => {
     setEditingId(service.id);
     setForm({
-      name: service.name,
-      gameId: service.gameId,
-      categoryId: service.categoryId,
+      name: service.name ?? '',
+      gameId: service.gameId ?? '',
+      categoryId: service.categoryId ?? '',
       price: service.price,
-      estimate: service.estimate,
+      estimate: service.estimate ?? '',
       active: service.active,
     });
     setFormMode('edit');
@@ -97,7 +108,7 @@ export const AdminServicesPage = () => {
         }
       );
       const payload = await response.json();
-      if (!response.ok) throw new Error(payload.status?.message ?? 'Gagal menyimpan layanan.');
+      if (!response.ok) throw new Error(payload.message ?? 'Gagal menyimpan layanan.');
       setFormMode(null);
       await load();
     } catch (cause) {
@@ -111,7 +122,7 @@ export const AdminServicesPage = () => {
     try {
       const response = await apiFetch(`/api/admin/services/v1/delete/${deleteTarget.id}`, { method: 'DELETE' });
       const payload = await response.json();
-      if (!response.ok) throw new Error(payload.status?.message ?? 'Gagal menghapus layanan.');
+      if (!response.ok) throw new Error(payload.message ?? 'Gagal menghapus layanan.');
       setDeleteTarget(null);
       await load();
     } catch (cause) {

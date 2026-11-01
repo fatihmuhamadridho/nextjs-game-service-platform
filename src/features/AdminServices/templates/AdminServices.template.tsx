@@ -246,7 +246,7 @@ export const AdminServicesTemplate = ({
                 <input
                   required
                   autoFocus
-                  value={form.name}
+                  value={form.name ?? ''}
                   onChange={(event: ChangeEvent<HTMLInputElement>) => updateField('name', event.target.value)}
                   placeholder="Contoh: Top Up Diamond 100"
                 />
@@ -256,7 +256,7 @@ export const AdminServicesTemplate = ({
                   Game
                   <select
                     required
-                    value={form.gameId}
+                    value={form.gameId ?? ''}
                     onChange={(event: ChangeEvent<HTMLSelectElement>) => updateField('gameId', event.target.value)}
                   >
                     <option value="">Pilih game</option>
@@ -271,7 +271,7 @@ export const AdminServicesTemplate = ({
                   Kategori
                   <select
                     required
-                    value={form.categoryId}
+                    value={form.categoryId ?? ''}
                     onChange={(event: ChangeEvent<HTMLSelectElement>) => updateField('categoryId', event.target.value)}
                   >
                     <option value="">Pilih kategori</option>
@@ -302,7 +302,7 @@ export const AdminServicesTemplate = ({
                   Estimasi
                   <input
                     required
-                    value={form.estimate}
+                    value={form.estimate ?? ''}
                     onChange={(event: ChangeEvent<HTMLInputElement>) => updateField('estimate', event.target.value)}
                     placeholder="Contoh: 1–2 hari"
                   />

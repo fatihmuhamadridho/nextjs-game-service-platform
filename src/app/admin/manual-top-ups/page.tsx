@@ -1,3 +1,5 @@
-import { AdminManualTopUpsPage } from '@features/AdminManualTopUps/pages/AdminManualTopUps.page';
+import { redirect } from 'next/navigation';
 
-export default AdminManualTopUpsPage;
+export default function Page() {
+  redirect('/admin');
+}

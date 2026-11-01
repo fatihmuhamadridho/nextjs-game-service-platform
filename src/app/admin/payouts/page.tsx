@@ -1,3 +1,5 @@
-import { AdminPayoutsPage } from '@features/AdminPayouts/pages/AdminPayouts.page';
+import { redirect } from 'next/navigation';
 
-export default AdminPayoutsPage;
+export default function Page() {
+  redirect('/admin');
+}

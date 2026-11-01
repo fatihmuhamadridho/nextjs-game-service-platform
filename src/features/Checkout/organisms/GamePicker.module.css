@@ -9,10 +9,51 @@
   grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 8px;
 }
+.skeletonChoice {
+  min-height: 83px;
+  padding: 7px 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #27384b;
+  border-radius: 9px;
+  background: #121d2c;
+}
+.skeletonChoice > span,
+.skeletonChoice > i {
+  display: block;
+  border-radius: 6px;
+  background: linear-gradient(100deg, #1c2a3b 20%, #293b51 45%, #1c2a3b 70%);
+  background-size: 220% 100%;
+  animation: catalogShimmer 1.4s ease-in-out infinite;
+}
+.skeletonChoice > span {
+  width: 100%;
+  height: 43px;
+}
+.skeletonChoice > i {
+  width: 55%;
+  height: 8px;
+}
+@keyframes catalogShimmer {
+  to { background-position: -220% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .skeletonChoice > span,
+  .skeletonChoice > i { animation: none; }
+}
 @media (max-width: 900px) {
   .picker {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
+  .skeletonChoice {
+    width: 78px;
+    min-width: 78px;
+    min-height: 77px;
+    padding: 6px 4px;
+  }
+  .skeletonChoice > span { height: 41px; }
 }
 @media (max-width: 640px) {
   .panel {

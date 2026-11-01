@@ -1,9 +1,5 @@
-import { HelpPage } from '@features/Help/pages/Help.page';
-import { notFound } from 'next/navigation';
-import { FEATURE_SPRINT_2 } from '@configs/base.config';
+import { redirect } from 'next/navigation';
 
 export default function Page() {
-  if (!FEATURE_SPRINT_2) notFound();
-
-  return <HelpPage />;
+  redirect('/');
 }

@@ -10,6 +10,7 @@ import styles from './Auth.module.css';
 type Props = { mode: 'login' | 'register' | 'recovery' | 'reset'; children: ReactNode };
 
 export function AuthTemplate({ mode, children }: Props) {
+  const isAdminLogin = mode === 'login';
   const isRegister = mode === 'register';
   const isRecovery = mode === 'recovery';
   const isReset = mode === 'reset';
@@ -35,7 +36,7 @@ export function AuthTemplate({ mode, children }: Props) {
       <Header />
       <section
         className={styles.authLayout}
-        aria-label={isRegister ? 'Buat akun JokiHub' : isAccountAction ? 'Pemulihan akun JokiHub' : 'Masuk ke JokiHub'}
+        aria-label={isRegister ? 'Buat akun bongastore' : isAccountAction ? 'Pemulihan akun bongastore' : 'Masuk ke bongastore'}
       >
         <div className={styles.intro}>
           <span className={styles.eyebrow}>
@@ -47,19 +48,19 @@ export function AuthTemplate({ mode, children }: Props) {
               <>
                 Buat Akun
                 <br />
-                Joki<span>Hub</span>
+                bonga<span>store</span>
               </>
             ) : isAccountAction ? (
               <>
                 {isRecovery ? 'Pulihkan' : 'Atur'}
                 <br />
-                Akun Joki<span>Hub</span>
+                Akun bonga<span>store</span>
               </>
             ) : (
               <>
                 Masuk ke
                 <br />
-                Akun Joki<span>Hub</span>
+                Akun bonga<span>store</span>
               </>
             )}
           </h1>
@@ -67,8 +68,8 @@ export function AuthTemplate({ mode, children }: Props) {
             {isRegister
               ? 'Daftar sekarang dan nikmati kemudahan top up, joki game, serta berbagai layanan gaming terpercaya.'
               : isAccountAction
-                ? 'Ikuti langkah pemulihan untuk kembali mengakses akun JokiHub kamu.'
-                : 'Lanjutkan perjalanan gaming kamu dengan akun JokiHub. Akses riwayat pesanan, kelola akun, dan nikmati layanan lebih cepat.'}
+                ? 'Ikuti langkah pemulihan untuk kembali mengakses akun bongastore kamu.'
+                : 'Lanjutkan perjalanan gaming kamu dengan akun bongastore. Akses riwayat pesanan, kelola akun, dan nikmati layanan lebih cepat.'}
           </p>
           <ul className={styles.benefits}>
             {benefits.map(({ icon: BenefitIcon, title, description }) => (
@@ -103,7 +104,7 @@ export function AuthTemplate({ mode, children }: Props) {
             <h2 id="form-title">{title}</h2>
             <p>
               {isRegister
-                ? 'Lengkapi data berikut untuk membuat akun JokiHub'
+                ? 'Lengkapi data berikut untuk membuat akun bongastore'
                 : isRecovery
                   ? 'Masukkan email akun customer untuk menerima tautan pemulihan'
                   : isReset
@@ -112,7 +113,7 @@ export function AuthTemplate({ mode, children }: Props) {
             </p>
           </div>
           {children}
-          {!isAccountAction && (FEATURE_GOOGLE_AUTH || FEATURE_SPRINT_2) && (
+          {!isAdminLogin && !isAccountAction && (FEATURE_GOOGLE_AUTH || FEATURE_SPRINT_2) && (
             <>
               <div className={styles.divider}>
                 <span />
@@ -122,7 +123,7 @@ export function AuthTemplate({ mode, children }: Props) {
               <AuthSocial verb={isRegister ? 'Daftar' : 'Masuk'} />
             </>
           )}
-          {(isRegister || isAccountAction || FEATURE_REGISTER) && (
+          {!isAdminLogin && (isRegister || isAccountAction || FEATURE_REGISTER) && (
             <p className={styles.switchMode}>
               {isRegister ? 'Sudah punya akun?' : isAccountAction ? 'Ingat password?' : 'Belum punya akun?'}{' '}
               <a href={isRegister || isAccountAction ? '/login' : '/register'}>

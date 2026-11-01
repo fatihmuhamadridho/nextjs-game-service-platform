@@ -12,7 +12,7 @@ export const HeroSection = () => (
         <br />
         Joki <span>Tercepat</span>
       </h1>
-      <p>Proses instan, aman, dan harga terbaik untuk semua game favorit kamu. Ribuan pemain sudah percaya JokiHub.</p>
+      <p>Proses instan, aman, dan harga terbaik untuk semua game favorit kamu. Ribuan pemain sudah percaya bongastore.</p>
       <div className={styles.trust}>
         <div>
           <i>
