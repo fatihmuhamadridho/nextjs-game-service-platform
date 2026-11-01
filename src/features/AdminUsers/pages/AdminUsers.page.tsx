@@ -37,7 +37,7 @@ export const AdminUsersPage = () => {
     try {
       const response = await apiFetch(`/api/admin/users/v1/list?${params}`, { cache: 'no-store' });
       const payload = await response.json();
-      if (!response.ok) throw new Error(payload.status?.message ?? 'Gagal memuat user.');
+      if (!response.ok) throw new Error(payload.message ?? 'Gagal memuat user.');
       setUsers(
         payload.data.users.map(
           (user: { id: string; name: string; username: string; email: string; status: string; joinedAt: string }) => ({
@@ -92,7 +92,7 @@ export const AdminUsersPage = () => {
         }
       );
       const payload = await response.json();
-      if (!response.ok) throw new Error(payload.status?.message ?? 'Gagal menyimpan user.');
+      if (!response.ok) throw new Error(payload.message ?? 'Gagal menyimpan user.');
       setFormMode(null);
       await load();
     } catch (cause) {
@@ -105,7 +105,7 @@ export const AdminUsersPage = () => {
     try {
       const response = await apiFetch(`/api/admin/users/v1/delete/${deleteTarget.id}`, { method: 'DELETE' });
       const payload = await response.json();
-      if (!response.ok) throw new Error(payload.status?.message ?? 'Gagal menghapus user.');
+      if (!response.ok) throw new Error(payload.message ?? 'Gagal menghapus user.');
       setDeleteTarget(null);
       await load();
     } catch (cause) {
@@ -116,7 +116,7 @@ export const AdminUsersPage = () => {
     try {
       const response = await apiFetch(`/api/admin/users/v1/detail/${user.id}`, { cache: 'no-store' });
       const payload = await response.json();
-      if (!response.ok) throw new Error(payload.status?.message ?? 'Gagal memuat detail user.');
+      if (!response.ok) throw new Error(payload.message ?? 'Gagal memuat detail user.');
       const detail = payload.data.user;
       setViewTarget({
         ...user,

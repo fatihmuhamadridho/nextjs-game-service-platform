@@ -35,7 +35,7 @@ export const AdminAccountsRolesPage = () => {
     try {
       const response = await apiFetch('/api/admin/roles/v1/list', { cache: 'no-store' });
       const payload = await response.json();
-      if (!response.ok) throw new Error(payload.status?.message ?? 'Gagal memuat role.');
+      if (!response.ok) throw new Error(payload.message ?? 'Gagal memuat role.');
       setRoles(payload.data.roles as RoleView[]);
       setPermissionCatalog(payload.data.permissionCatalog as PermissionCatalogItem[]);
       setError('');
@@ -92,7 +92,7 @@ export const AdminAccountsRolesPage = () => {
         }
       );
       const payload = await response.json();
-      if (!response.ok) throw new Error(payload.status?.message ?? 'Gagal menyimpan role.');
+      if (!response.ok) throw new Error(payload.message ?? 'Gagal menyimpan role.');
       setFormMode(null);
       setSaved(false);
       await load();
@@ -113,7 +113,7 @@ export const AdminAccountsRolesPage = () => {
     try {
       const response = await apiFetch(`/api/admin/roles/v1/delete/${deleteTarget.id}`, { method: 'DELETE' });
       const payload = await response.json();
-      if (!response.ok) throw new Error(payload.status?.message ?? 'Gagal menghapus role.');
+      if (!response.ok) throw new Error(payload.message ?? 'Gagal menghapus role.');
       setDeleteTarget(null);
       await load();
     } catch (cause) {

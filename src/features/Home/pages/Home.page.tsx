@@ -32,17 +32,34 @@ export const HomePage = () => {
       .then((response) => response.json())
       .then(
         (result: {
-          data?: {
-            games?: Array<{ name: string; slug: string; serviceSummary: string | null; artworkKey: string | null }>;
-          };
+          data?:
+            | Array<{
+                name: string;
+                slug: string;
+                description?: string | null;
+                imageUrl?: string | null;
+                serviceSummary?: string | null;
+                artworkKey?: string | null;
+              }>
+            | {
+                games?: Array<{
+                  name: string;
+                  slug: string;
+                  description?: string | null;
+                  imageUrl?: string | null;
+                  serviceSummary?: string | null;
+                  artworkKey?: string | null;
+                }>;
+              };
         }) => {
+          const games = Array.isArray(result.data) ? result.data : (result.data?.games ?? []);
           if (alive)
             setGames(
-              (result.data?.games ?? []).map((game) => ({
+              games.map((game) => ({
                 name: game.name,
                 slug: game.slug,
-                service: game.serviceSummary ?? 'Lihat layanan tersedia',
-                art: game.artworkKey ?? game.slug,
+                service: game.serviceSummary ?? game.description ?? 'Lihat layanan tersedia',
+                art: game.artworkKey ?? game.imageUrl ?? game.slug,
                 mark: game.name.slice(0, 1),
               }))
             );

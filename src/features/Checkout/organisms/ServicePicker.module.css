@@ -9,6 +9,48 @@
   flex-direction: column;
   gap: 5px;
 }
+.skeletonRow {
+  min-height: 48px;
+  padding: 0 9px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid #202f42;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #111d2b, #0e1926);
+}
+.skeletonRow > span,
+.skeletonRow > i,
+.skeletonRow > b {
+  display: block;
+  border-radius: 5px;
+  background: linear-gradient(100deg, #1c2a3b 20%, #293b51 45%, #1c2a3b 70%);
+  background-size: 220% 100%;
+  animation: catalogShimmer 1.4s ease-in-out infinite;
+}
+.skeletonRow > span {
+  width: 17px;
+  height: 17px;
+  flex: none;
+  border-radius: 50%;
+}
+.skeletonRow > i {
+  width: 38%;
+  height: 12px;
+}
+.skeletonRow > b {
+  width: 52px;
+  height: 12px;
+  margin-left: auto;
+}
+@keyframes catalogShimmer {
+  to { background-position: -220% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .skeletonRow > span,
+  .skeletonRow > i,
+  .skeletonRow > b { animation: none; }
+}
 @media (max-width: 640px) {
   .panel {
     padding: 12px !important;
@@ -17,4 +59,5 @@
   .list {
     gap: 4px;
   }
+  .skeletonRow { min-height: 49px; padding: 0 7px; gap: 8px; }
 }

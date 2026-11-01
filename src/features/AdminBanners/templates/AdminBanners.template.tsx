@@ -61,37 +61,8 @@ export const AdminBannersTemplate = ({
   onDeleteConfirm,
 }: Props) => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [uploadError, setUploadError] = useState('');
   const updateField = <K extends keyof AdminBannerForm>(field: K, value: AdminBannerForm[K]) =>
     onFormChange((current) => ({ ...current, [field]: value }));
-
-  const handleImageSelect = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    if (!file.type.startsWith('image/')) {
-      setUploadError('Pilih file gambar.');
-      return;
-    }
-    if (file.size > 5 * 1024 * 1024) {
-      setUploadError('Ukuran gambar maksimal 5 MB.');
-      return;
-    }
-    setUploadError('');
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result !== 'string') return;
-      onFormChange((current) => ({ ...current, imageUrl: reader.result as string, imageName: file.name }));
-    };
-    reader.readAsDataURL(file);
-  };
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    if (formMode === 'create' && !form.imageUrl) {
-      event.preventDefault();
-      setUploadError('Pilih gambar banner yang valid terlebih dahulu.');
-      return;
-    }
-    onSave(event);
-  };
 
   return (
     <main className={styles.page}>
@@ -108,10 +79,7 @@ export const AdminBannersTemplate = ({
           </div>
           <button
             className={styles.createButton}
-            onClick={() => {
-              setUploadError('');
-              onCreate();
-            }}
+            onClick={onCreate}
           >
             <IconPlus /> Tambah Banner
           </button>
@@ -199,7 +167,7 @@ export const AdminBannersTemplate = ({
                         </span>
                         <span>
                           <b>{banner.title}</b>
-                          <small>{banner.imageName || 'Gambar belum dipilih'}</small>
+                          <small>{banner.imageName || (banner.imageUrl ? 'Gambar dari URL' : 'URL gambar belum diatur')}</small>
                         </span>
                       </span>
                     </td>
@@ -223,10 +191,7 @@ export const AdminBannersTemplate = ({
                       <div className={styles.rowActions}>
                         <button
                           aria-label={`Edit ${banner.title}`}
-                          onClick={() => {
-                            setUploadError('');
-                            onEdit(banner);
-                          }}
+                          onClick={() => onEdit(banner)}
                         >
                           <IconEdit /> Edit
                         </button>
@@ -251,7 +216,7 @@ export const AdminBannersTemplate = ({
               </div>
             )}
           </div>
-          <p className={styles.demoNote}>Data contoh. Perubahan dan gambar hanya tersimpan di halaman ini.</p>
+          <p className={styles.demoNote}>Metadata banner tersimpan melalui API. Gambar ditampilkan dari URL publik.</p>
         </Box>
       </div>
 
@@ -272,13 +237,13 @@ export const AdminBannersTemplate = ({
                 <IconX />
               </button>
             </div>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={onSave}>
               <label>
                 Nama Banner
                 <input
                   required
                   autoFocus
-                  value={form.title}
+                  value={form.title ?? ''}
                   onChange={(event: ChangeEvent<HTMLInputElement>) => updateField('title', event.target.value)}
                   placeholder="Contoh: Banner Utama"
                 />
@@ -286,7 +251,7 @@ export const AdminBannersTemplate = ({
               <label>
                 Deskripsi
                 <input
-                  value={form.description}
+                  value={form.description ?? ''}
                   onChange={(event: ChangeEvent<HTMLInputElement>) => updateField('description', event.target.value)}
                   placeholder="Keterangan internal banner"
                 />
@@ -295,7 +260,7 @@ export const AdminBannersTemplate = ({
                 <label>
                   Posisi Tayang
                   <select
-                    value={form.placement}
+                    value={form.placement ?? 'Homepage'}
                     onChange={(event: ChangeEvent<HTMLSelectElement>) =>
                       updateField('placement', event.target.value as BannerPlacement)
                     }
@@ -321,28 +286,24 @@ export const AdminBannersTemplate = ({
               <label>
                 Link Tujuan
                 <input
-                  value={form.targetUrl}
+                    value={form.targetUrl ?? ''}
                   onChange={(event: ChangeEvent<HTMLInputElement>) => updateField('targetUrl', event.target.value)}
                   placeholder="/games"
                 />
               </label>
               <label>
-                Gambar Banner
+                URL Gambar Banner
                 <input
-                  type="file"
-                  accept="image/*"
-                  required={formMode === 'create' && !form.imageUrl}
-                  onChange={handleImageSelect}
+                  type="url"
+                  required
+                  value={form.imageUrl ?? ''}
+                  onChange={(event: ChangeEvent<HTMLInputElement>) => updateField('imageUrl', event.target.value)}
+                  placeholder="https://drive.google.com/..."
                 />
                 <small className={styles.fieldHint}>
-                  Format gambar, maksimal 5 MB. Gambar hanya dipratinjau lokal.
+                  Gunakan URL gambar yang dapat diakses publik, termasuk URL gambar dari Google Drive.
                 </small>
               </label>
-              {uploadError && (
-                <p className={styles.uploadError} role="alert">
-                  {uploadError}
-                </p>
-              )}
               <div className={styles.preview}>
                 {form.imageUrl ? (
                   <Image src={form.imageUrl} alt="Pratinjau banner yang dipilih" width={800} height={300} unoptimized />
@@ -350,7 +311,7 @@ export const AdminBannersTemplate = ({
                   <span>
                     <IconPhoto />
                     <b>Pratinjau banner</b>
-                    <small>Pilih gambar untuk melihat pratinjau.</small>
+                    <small>Masukkan URL gambar untuk melihat pratinjau.</small>
                   </span>
                 )}
               </div>

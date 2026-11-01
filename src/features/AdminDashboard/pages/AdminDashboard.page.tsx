@@ -93,7 +93,7 @@ export const AdminDashboardPage = () => {
     try {
       const response = await apiFetch(`/api/admin/dashboard/v1/overview?${params}`, { cache: 'no-store' });
       const payload = await response.json();
-      if (!response.ok) throw new Error(payload.status?.message ?? 'Gagal memuat dashboard.');
+      if (!response.ok) throw new Error(payload.message ?? 'Gagal memuat dashboard.');
       setOverview(payload.data.overview as Overview);
       setError('');
     } catch (cause) {
@@ -205,7 +205,7 @@ export const AdminDashboardPage = () => {
         <div className={styles.pageHeading}>
           <div>
             <h1>Dashboard</h1>
-            <p>Ringkasan performa JokiHub secara real-time.</p>
+            <p>Ringkasan performa bongastore secara real-time.</p>
           </div>
           <label className={styles.dateSelect}>
             <IconCalendar />

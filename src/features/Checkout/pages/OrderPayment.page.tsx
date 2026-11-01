@@ -5,12 +5,12 @@ import { apiFetch } from '@services/apiFetch.service';
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { FEATURE_SPRINT_2 } from '@configs/base.config';
 import { Footer } from '@common-ui/organisms/Footer/Footer';
 import { CheckoutHeader } from '../organisms/CheckoutHeader.organism';
 import { PaymentStep } from '../organisms/PaymentStep.organism';
 import type { CheckoutApiResponse, CheckoutService } from '../interfaces/checkout.interface';
 import styles from '../templates/Checkout.module.css';
+import { clearOrderTrackingToken, getOrderTrackingToken } from '@utils/brandStorage';
 
 type PaymentData = {
   order: {
@@ -50,7 +50,7 @@ export const OrderPaymentPage = ({ orderNumber }: { orderNumber: string }) => {
   const resultUrl = `${paymentUrl}/result`;
 
   const loadPayment = useCallback(async () => {
-    const token = sessionStorage.getItem(`jokihub-tracking:${orderNumber}`);
+    const token = getOrderTrackingToken(orderNumber);
     if (!token) {
       router.replace(recoveryUrl(orderNumber, paymentUrl));
       return;
@@ -62,11 +62,11 @@ export const OrderPaymentPage = ({ orderNumber }: { orderNumber: string }) => {
       });
       const result = (await response.json()) as CheckoutApiResponse<PaymentData>;
       if (response.status === 401) {
-        sessionStorage.removeItem(`jokihub-tracking:${orderNumber}`);
+        clearOrderTrackingToken(orderNumber);
         router.replace(recoveryUrl(orderNumber, paymentUrl));
         return;
       }
-      if (!response.ok || !result.data) throw new Error(result.status.message);
+      if (!response.ok || !result.data) throw new Error(result.message ?? 'Instruksi pembayaran tidak dapat dimuat.');
       if (['PENDING_REVIEW', 'PAID'].includes(result.data.order.paymentStatus)) {
         router.replace(resultUrl);
         return;
@@ -86,36 +86,31 @@ export const OrderPaymentPage = ({ orderNumber }: { orderNumber: string }) => {
 
   const reportPaid = () => {
     if (reporting) return;
-    if (!FEATURE_SPRINT_2) {
-      const token = sessionStorage.getItem(`jokihub-tracking:${orderNumber}`);
-      if (!token) {
-        router.replace(recoveryUrl(orderNumber, paymentUrl));
-        return;
-      }
-      setReporting(true);
-      void (async () => {
-        try {
-          const response = await apiFetch(`/api/orders/v1/tracking/${encodeURIComponent(orderNumber)}/payment`, {
-            method: 'POST',
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          const result = (await response.json()) as CheckoutApiResponse<{ paymentStatus: string }>;
-          if (response.status === 401) {
-            sessionStorage.removeItem(`jokihub-tracking:${orderNumber}`);
-            router.replace(recoveryUrl(orderNumber, paymentUrl));
-            return;
-          }
-          if (!response.ok || !result.data) throw new Error(result.status.message);
-          router.push(resultUrl);
-        } catch (error) {
-          setMessage(error instanceof Error ? error.message : 'Konfirmasi pembayaran gagal. Coba lagi.');
-          setReporting(false);
-        }
-      })();
+    const token = getOrderTrackingToken(orderNumber);
+    if (!token) {
+      router.replace(recoveryUrl(orderNumber, paymentUrl));
       return;
     }
     setReporting(true);
-    router.push(resultUrl);
+    void (async () => {
+      try {
+        const response = await apiFetch(`/api/orders/v1/tracking/${encodeURIComponent(orderNumber)}/payment`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const result = (await response.json()) as CheckoutApiResponse<{ paymentStatus: string }>;
+        if (response.status === 401) {
+          clearOrderTrackingToken(orderNumber);
+          router.replace(recoveryUrl(orderNumber, paymentUrl));
+          return;
+        }
+        if (!response.ok || !result.data) throw new Error(result.message ?? 'Status pembayaran tidak dapat diperbarui.');
+        router.push(resultUrl);
+      } catch (error) {
+        setMessage(error instanceof Error ? error.message : 'Konfirmasi pembayaran gagal. Coba lagi.');
+        setReporting(false);
+      }
+    })();
   };
 
   const service: CheckoutService | undefined = payment

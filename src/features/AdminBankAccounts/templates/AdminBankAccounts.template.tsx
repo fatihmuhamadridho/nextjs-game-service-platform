@@ -32,8 +32,10 @@ type Props = {
   deleteTarget: BankAccountView | null;
   onDeleteSelect: (account: BankAccountView | null) => void;
   onDeleteConfirm: () => void;
+  loading: boolean;
+  error: string;
 };
-const banks = ['BCA', 'Mandiri', 'BNI', 'BRI', 'BSI', 'CIMB Niaga', 'Bank Lain'];
+const banks = ['BCA'];
 
 export const AdminBankAccountsTemplate = ({
   accounts,
@@ -53,6 +55,8 @@ export const AdminBankAccountsTemplate = ({
   deleteTarget,
   onDeleteSelect,
   onDeleteConfirm,
+  loading,
+  error,
 }: Props) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const updateField = <K extends keyof BankAccountForm>(field: K, value: BankAccountForm[K]) =>
@@ -63,6 +67,7 @@ export const AdminBankAccountsTemplate = ({
       <AdminHeader query={query} onQueryChange={onQueryChange} onMenuOpen={() => setMenuOpen(true)} />
       <AdminSidebar open={menuOpen} onClose={() => setMenuOpen(false)} activeItem="Rekening" />
       <div className={styles.main}>
+        {error && <p role="alert">{error}</p>}
         <div className={styles.heading}>
           <div>
             <p className={styles.breadcrumb}>
@@ -148,7 +153,7 @@ export const AdminBankAccountsTemplate = ({
                     </td>
                     <td>
                       <span className={styles.numberCell}>
-                        {account.accountNumber}
+                        {account.accountNumber.replace(/\d(?=\d{4})/g, '•')}
                         {account.isPrimary && (
                           <em>
                             <IconStar />
@@ -197,14 +202,18 @@ export const AdminBankAccountsTemplate = ({
             {!filteredAccounts.length && (
               <div className={styles.empty}>
                 <IconBuildingBank />
-                <b>Rekening tidak ditemukan</b>
-                <span>Coba kata kunci atau filter lain.</span>
+                <b>{loading ? 'Memuat rekening…' : accounts.length ? 'Rekening tidak ditemukan' : 'Belum ada rekening'}</b>
+                <span>
+                  {loading
+                    ? 'Mengambil data rekening dari backend.'
+                    : accounts.length
+                      ? 'Coba kata kunci atau filter lain.'
+                      : 'Tambahkan rekening bank resmi untuk menerima pembayaran.'}
+                </span>
               </div>
             )}
           </div>
-          <p className={styles.demoNote}>
-            Data contoh. Nomor rekening disamarkan. Perubahan hanya tersimpan selama halaman ini terbuka.
-          </p>
+          <p className={styles.demoNote}>Data rekening dan perubahannya dikelola melalui backend.</p>
         </Box>
       </div>
       {formMode && (
@@ -290,7 +299,7 @@ export const AdminBankAccountsTemplate = ({
                 />
                 <span>Jadikan rekening utama</span>
               </label>
-              <p className={styles.formNote}>Prototipe belum menyimpan data ke server.</p>
+              <p className={styles.formNote}>Nomor rekening disamarkan pada daftar rekening.</p>
               <div className={styles.dialogActions}>
                 <button type="button" className={styles.cancelButton} onClick={onCloseForm}>
                   Batal
@@ -317,7 +326,7 @@ export const AdminBankAccountsTemplate = ({
                 <p>
                   {deleteTarget.isPrimary
                     ? 'Rekening utama tidak dapat dihapus. Jadikan rekening lain sebagai utama lebih dulu.'
-                    : 'Rekening ini dihapus dari daftar pada sesi ini.'}
+                    : 'Rekening ini akan dihapus dari sistem.'}
                 </p>
               </div>
               <button className={styles.closeButton} aria-label="Tutup" onClick={() => onDeleteSelect(null)}>

@@ -1,3 +1,5 @@
-import { AdminComplaintsPage } from '@features/AdminComplaints/pages/AdminComplaints.page';
+import { redirect } from 'next/navigation';
 
-export default AdminComplaintsPage;
+export default function Page() {
+  redirect('/admin');
+}

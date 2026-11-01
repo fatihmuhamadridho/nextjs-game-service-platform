@@ -5,7 +5,7 @@ import styles from './Benefits.module.css';
 
 export const Benefits = ({ items }: { items: HomeBenefit[] }) => (
   <section className={styles.section}>
-    <SectionHeading title="Kenapa Pilih JokiHub?" />
+    <SectionHeading title="Kenapa Pilih bongastore?" />
     <div className={styles.grid}>
       {items.map((item) => (
         <BenefitCard item={item} key={item.title} />

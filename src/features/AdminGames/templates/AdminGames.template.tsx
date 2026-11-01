@@ -63,7 +63,7 @@ export const AdminGamesTemplate = ({
   saving,
 }: Props) => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const formArtwork = getGameArtworkPath(form.artworkKey || form.slug);
+  const formArtwork = getGameArtworkPath(form.imageUrl);
   const updateField = <K extends keyof AdminGameForm>(field: K, value: AdminGameForm[K]) =>
     onFormChange((current) => ({ ...current, [field]: value }));
   const handleNameChange = (value: string) =>
@@ -96,7 +96,7 @@ export const AdminGamesTemplate = ({
               Dashboard <span>/</span> Produk &amp; Layanan <span>/</span> <b>Game</b>
             </p>
             <h1>Kelola Game</h1>
-            <p>Tambah dan atur game yang tersedia di JokiHub.</p>
+            <p>Tambah dan atur game yang tersedia di bongastore.</p>
           </div>
           <button className={styles.createButton} onClick={onCreate}>
             <IconPlus /> Tambah Game
@@ -177,8 +177,8 @@ export const AdminGamesTemplate = ({
                     <td>
                       <span className={styles.gameName}>
                         <i className={styles.gameThumbnail}>
-                          {getGameArtworkPath(game.artworkKey) ? (
-                            <GameArtworkImage src={getGameArtworkPath(game.artworkKey)!} sizes="30px" />
+                          {getGameArtworkPath(game.imageUrl) ? (
+                            <GameArtworkImage src={getGameArtworkPath(game.imageUrl)!} sizes="30px" />
                           ) : (
                             <IconDeviceGamepad2 />
                           )}
@@ -289,14 +289,16 @@ export const AdminGamesTemplate = ({
                 />
               </label>
               <label>
-                Artwork key atau path lokal
+                URL Gambar Game
                 <input
-                  maxLength={160}
-                  value={form.artworkKey ?? ''}
-                  onChange={(event: ChangeEvent<HTMLInputElement>) => updateField('artworkKey', event.target.value)}
-                  placeholder="ml atau /images/games/mobile-legends.webp"
+                  type="url"
+                  maxLength={2048}
+                  required
+                  value={form.imageUrl}
+                  onChange={(event: ChangeEvent<HTMLInputElement>) => updateField('imageUrl', event.target.value)}
+                  placeholder="https://..."
                 />
-                <small>Path lokal harus berada di public/images/games/.</small>
+                <small>Gunakan URL publik dari Google Drive atau sumber gambar online.</small>
                 <div className={styles.artworkPreview} aria-label={`Pratinjau artwork ${form.name || 'game'}`}>
                   {formArtwork ? <GameArtworkImage src={formArtwork} sizes="180px" /> : <IconDeviceGamepad2 />}
                 </div>

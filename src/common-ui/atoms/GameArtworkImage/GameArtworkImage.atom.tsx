@@ -7,5 +7,5 @@ type Props = {
 };
 
 export const GameArtworkImage = ({ src, sizes }: Props) => (
-  <Image src={src} alt="" fill sizes={sizes} className={styles.image} />
+  <Image src={src} alt="" fill sizes={sizes} className={styles.image} unoptimized />
 );

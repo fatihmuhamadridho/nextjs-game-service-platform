@@ -1,38 +1,11 @@
 'use client';
 
-import { useMemo, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
+import { apiRequest } from '@services/apiFetch.service';
+import { withCurrentBrandName } from '@utils/display-brand';
 import type { AdminPageForm, AdminPageStatusFilter, AdminPageView } from '../interfaces/admin-page.interface';
 import { AdminPagesTemplate } from '../templates/AdminPages.template';
 
-const seedPages: AdminPageView[] = [
-  {
-    id: 'page-1',
-    title: 'Tentang Kami',
-    slug: 'tentang-kami',
-    summary: 'Informasi tentang JokiHub dan layanan platform.',
-    content: 'JokiHub menyediakan layanan game dan top up untuk pengguna.',
-    status: 'Published',
-    updatedAt: '11 Okt 2026',
-  },
-  {
-    id: 'page-2',
-    title: 'Syarat & Ketentuan',
-    slug: 'syarat-ketentuan',
-    summary: 'Ketentuan penggunaan layanan JokiHub.',
-    content: 'Ketentuan penggunaan layanan JokiHub.',
-    status: 'Published',
-    updatedAt: '9 Okt 2026',
-  },
-  {
-    id: 'page-3',
-    title: 'Kebijakan Privasi',
-    slug: 'kebijakan-privasi',
-    summary: 'Informasi pengelolaan data pengguna.',
-    content: 'Kebijakan privasi untuk penggunaan layanan JokiHub.',
-    status: 'Draft',
-    updatedAt: '7 Okt 2026',
-  },
-];
 const emptyForm: AdminPageForm = { title: '', slug: '', summary: '', content: '', status: 'Draft' };
 const makeSlug = (value: string) =>
   value
@@ -42,13 +15,37 @@ const makeSlug = (value: string) =>
     .replace(/[\s-]+/g, '-');
 
 export const AdminPagesPage = () => {
-  const [pages, setPages] = useState(seedPages);
+  const [pages, setPages] = useState<AdminPageView[]>([]);
   const [query, setQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<AdminPageStatusFilter>('Semua Status');
   const [formMode, setFormMode] = useState<'create' | 'edit' | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<AdminPageForm>(emptyForm);
   const [deleteTarget, setDeleteTarget] = useState<AdminPageView | null>(null);
+  const [error, setError] = useState('');
+
+  const load = useCallback(async () => {
+    try {
+      const data = await apiRequest<{ pages: AdminPageView[] }>('/api/admin/pages/v1/list', { cache: 'no-store' });
+      setPages(
+        (data.pages ?? []).map((page) => ({
+          ...page,
+          title: withCurrentBrandName(page.title ?? ''),
+          slug: page.slug ?? '',
+          summary: withCurrentBrandName(page.summary ?? ''),
+          content: withCurrentBrandName(page.content ?? ''),
+          status: page.status ?? 'Draft',
+        }))
+      );
+      setError('');
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Halaman gagal dimuat.');
+    }
+  }, []);
+  useEffect(() => {
+    const timer = window.setTimeout(() => void load(), 0);
+    return () => window.clearTimeout(timer);
+  }, [load]);
 
   const filteredPages = useMemo(
     () =>
@@ -58,7 +55,6 @@ export const AdminPagesPage = () => {
       }),
     [pages, query, statusFilter]
   );
-
   const openCreate = () => {
     setEditingId(null);
     setForm({ ...emptyForm });
@@ -66,49 +62,76 @@ export const AdminPagesPage = () => {
   };
   const openEdit = (page: AdminPageView) => {
     setEditingId(page.id);
-    setForm({ title: page.title, slug: page.slug, summary: page.summary, content: page.content, status: page.status });
+    setForm({
+      title: withCurrentBrandName(page.title ?? ''),
+      slug: page.slug ?? '',
+      summary: withCurrentBrandName(page.summary ?? ''),
+      content: withCurrentBrandName(page.content ?? ''),
+      status: page.status ?? 'Draft',
+    });
     setFormMode('edit');
   };
-  const handleSave = (event: FormEvent<HTMLFormElement>) => {
+  const handleSave = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const next = {
+    const payload = {
       ...form,
       title: form.title.trim(),
       slug: makeSlug(form.slug || form.title),
       summary: form.summary.trim(),
       content: form.content.trim(),
-      updatedAt: 'Baru saja',
     };
-    if (formMode === 'edit' && editingId)
-      setPages((current) => current.map((page) => (page.id === editingId ? { ...page, ...next } : page)));
-    else setPages((current) => [{ id: `page-${Date.now()}`, ...next }, ...current]);
-    setFormMode(null);
+    try {
+      await apiRequest<unknown>(
+        formMode === 'edit' && editingId
+          ? `/api/admin/pages/v1/update/${encodeURIComponent(editingId)}`
+          : '/api/admin/pages/v1/create',
+        {
+          method: formMode === 'edit' ? 'PATCH' : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        }
+      );
+      setFormMode(null);
+      await load();
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Halaman gagal disimpan.');
+    }
   };
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (!deleteTarget) return;
-    setPages((current) => current.filter((page) => page.id !== deleteTarget.id));
-    setDeleteTarget(null);
+    try {
+      await apiRequest<unknown>(`/api/admin/pages/v1/delete/${encodeURIComponent(deleteTarget.id)}`, {
+        method: 'DELETE',
+      });
+      setDeleteTarget(null);
+      await load();
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Halaman gagal dihapus.');
+    }
   };
 
   return (
-    <AdminPagesTemplate
-      pages={pages}
-      filteredPages={filteredPages}
-      query={query}
-      onQueryChange={setQuery}
-      statusFilter={statusFilter}
-      onStatusFilterChange={setStatusFilter}
-      publishedCount={pages.filter((page) => page.status === 'Published').length}
-      formMode={formMode}
-      form={form}
-      onFormChange={setForm}
-      onCreate={openCreate}
-      onEdit={openEdit}
-      onSave={handleSave}
-      onCloseForm={() => setFormMode(null)}
-      deleteTarget={deleteTarget}
-      onDeleteSelect={setDeleteTarget}
-      onDeleteConfirm={confirmDelete}
-    />
+    <>
+      {error && <p role="alert">{error}</p>}
+      <AdminPagesTemplate
+        pages={pages}
+        filteredPages={filteredPages}
+        query={query}
+        onQueryChange={setQuery}
+        statusFilter={statusFilter}
+        onStatusFilterChange={setStatusFilter}
+        publishedCount={pages.filter((page) => page.status === 'Published').length}
+        formMode={formMode}
+        form={form}
+        onFormChange={setForm}
+        onCreate={openCreate}
+        onEdit={openEdit}
+        onSave={handleSave}
+        onCloseForm={() => setFormMode(null)}
+        deleteTarget={deleteTarget}
+        onDeleteSelect={setDeleteTarget}
+        onDeleteConfirm={() => void confirmDelete()}
+      />
+    </>
   );
 };

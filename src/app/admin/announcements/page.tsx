@@ -1,3 +1,5 @@
-import { AdminAnnouncementsPage } from '@features/AdminAnnouncements/pages/AdminAnnouncements.page';
+import { redirect } from 'next/navigation';
 
-export default AdminAnnouncementsPage;
+export default function Page() {
+  redirect('/admin');
+}

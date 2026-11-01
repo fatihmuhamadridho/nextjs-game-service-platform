@@ -37,7 +37,7 @@ export const handleLegacyUser = (url: URL, method: string) => {
       bank: { cardExpire: '01/30', cardNumber: '0000-0000-0000-0000', cardType: 'Demo', currency: 'IDR', iban: 'MOCK' },
       company: {
         department: 'Demo',
-        name: 'JokiHub',
+        name: 'bongastore',
         title: 'Pengguna',
         address: {
           address: 'Alamat contoh',
@@ -51,7 +51,7 @@ export const handleLegacyUser = (url: URL, method: string) => {
       },
       ein: 'MOCK',
       ssn: 'MOCK',
-      userAgent: 'JokiHub Mock API',
+      userAgent: 'bongastore Mock API',
       crypto: { coin: 'DemoCoin', wallet: 'MOCK', network: 'Demo' },
       role: 'user',
     };

@@ -20,7 +20,6 @@ export const AdminManagementPage = () => {
   const [roleFilter, setRoleFilter] = useState<AdminAccountRoleFilter>('Semua Role');
   const [statusFilter, setStatusFilter] = useState<AdminAccountStatusFilter>('Semua');
   const [formMode, setFormMode] = useState<'create' | 'edit' | null>(null);
-  const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<AdminAccountForm>(emptyForm);
   const [deleteTarget, setDeleteTarget] = useState<AdminAccountView | null>(null);
   const [viewTarget, setViewTarget] = useState<AdminAccountView | null>(null);
@@ -40,7 +39,7 @@ export const AdminManagementPage = () => {
       ]);
       const [adminPayload, rolePayload] = await Promise.all([adminResponse.json(), roleResponse.json()]);
       if (!adminResponse.ok || !roleResponse.ok)
-        throw new Error(adminPayload.status?.message ?? rolePayload.status?.message ?? 'Gagal memuat akun admin.');
+        throw new Error(adminPayload.message ?? rolePayload.message ?? 'Gagal memuat akun admin.');
       setAdmins(
         adminPayload.data.admins.map(
           (row: {
@@ -80,12 +79,10 @@ export const AdminManagementPage = () => {
     [admins, roleFilter]
   );
   const openCreate = () => {
-    setEditingId(null);
     setForm({ ...emptyForm, roleIds: roles[0] ? [roles[0].id] : [] });
     setFormMode('create');
   };
   const openEdit = (admin: AdminAccountView) => {
-    setEditingId(admin.id);
     setForm({
       name: admin.name,
       username: admin.username,
@@ -97,52 +94,17 @@ export const AdminManagementPage = () => {
   };
   const handleSave = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setError('');
-    const body = {
-      name: form.name.trim(),
-      username: form.username.trim().toLowerCase(),
-      email: form.email.trim().toLowerCase(),
-      ...(formMode === 'create'
-        ? { roleIds: form.roleIds }
-        : { roleIds: form.roleIds, status: form.status === 'Aktif' ? 'ACTIVE' : 'INACTIVE' }),
-    };
-    try {
-      const response = await apiFetch(
-        formMode === 'edit' && editingId
-          ? `/api/admin/admin-users/v1/update/${editingId}`
-          : '/api/admin/admin-users/v1/create',
-        {
-          method: formMode === 'edit' ? 'PATCH' : 'POST',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify(body),
-        }
-      );
-      const payload = await response.json();
-      if (!response.ok) throw new Error(payload.status?.message ?? 'Gagal menyimpan akun admin.');
-      setFormMode(null);
-      await load();
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'Gagal menyimpan akun admin.');
-    }
+    setError('Perubahan akun admin belum tersedia sebelum provisioning kredensial dikonfigurasi.');
   };
   const confirmDelete = async () => {
     if (!deleteTarget) return;
-    setError('');
-    try {
-      const response = await apiFetch(`/api/admin/admin-users/v1/delete/${deleteTarget.id}`, { method: 'DELETE' });
-      const payload = await response.json();
-      if (!response.ok) throw new Error(payload.status?.message ?? 'Gagal menonaktifkan akun admin.');
-      setDeleteTarget(null);
-      await load();
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'Gagal menonaktifkan akun admin.');
-    }
+    setError('Penghapusan akun admin belum tersedia sebelum provisioning kredensial dikonfigurasi.');
   };
   const viewAdmin = async (admin: AdminAccountView) => {
     try {
       const response = await apiFetch(`/api/admin/admin-users/v1/detail/${admin.id}`, { cache: 'no-store' });
       const payload = await response.json();
-      if (!response.ok) throw new Error(payload.status?.message ?? 'Gagal memuat detail admin.');
+      if (!response.ok) throw new Error(payload.message ?? 'Gagal memuat detail admin.');
       const detail = payload.data.admin;
       setViewTarget({ ...admin, username: detail.username, roleIds: detail.roleIds });
       setError('');

@@ -26,7 +26,7 @@ export const AdminActivityLogsPage = () => {
     try {
       const response = await apiFetch(`/api/admin/activity-logs/v1/list?${params}`, { cache: 'no-store' });
       const payload = await response.json();
-      if (!response.ok) throw new Error(payload.status?.message ?? 'Gagal memuat log aktivitas.');
+      if (!response.ok) throw new Error(payload.message ?? 'Gagal memuat log aktivitas.');
       setLogs(payload.data.activityLogs as ActivityLogView[]);
       setTotalCount(payload.data.total);
       setError('');

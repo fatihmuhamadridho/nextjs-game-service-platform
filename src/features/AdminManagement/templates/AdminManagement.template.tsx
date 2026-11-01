@@ -92,12 +92,20 @@ export const AdminManagementTemplate = ({
               Dashboard <span>/</span> Pengguna <span>/</span> <b>Admin</b>
             </p>
             <h1>Manajemen Admin</h1>
-            <p>Atur akun admin dan akses pengelolaan JokiHub.</p>
+            <p>Atur akun admin dan akses pengelolaan bongastore.</p>
           </div>
-          <button className={styles.createButton} onClick={onCreate}>
+          <button
+            className={styles.createButton}
+            onClick={onCreate}
+            disabled
+            title="Provisioning kredensial admin belum dikonfigurasi"
+          >
             <IconPlus /> Tambah Admin
           </button>
         </div>
+        <p role="status" className={styles.demoNote}>
+          Pembuatan, perubahan, dan penghapusan akun admin dinonaktifkan sampai provisioning kredensial tersedia.
+        </p>
 
         <section className={styles.metrics} aria-label="Ringkasan admin">
           <Box className={styles.metric} bordered rounded>
@@ -201,13 +209,20 @@ export const AdminManagementTemplate = ({
                         <button aria-label={`Lihat ${admin.name}`} onClick={() => onViewDetail(admin)}>
                           <IconEye /> Detail
                         </button>
-                        <button aria-label={`Edit ${admin.name}`} onClick={() => onEdit(admin)}>
+                        <button
+                          aria-label={`Edit ${admin.name}`}
+                          onClick={() => onEdit(admin)}
+                          disabled
+                          title="Provisioning kredensial admin belum dikonfigurasi"
+                        >
                           <IconEdit /> Edit
                         </button>
                         <button
                           className={styles.deleteButton}
                           aria-label={`Hapus ${admin.name}`}
                           onClick={() => onDeleteSelect(admin)}
+                          disabled
+                          title="Provisioning kredensial admin belum dikonfigurasi"
                         >
                           <IconTrash />
                         </button>
@@ -394,15 +409,6 @@ export const AdminManagementTemplate = ({
               )}
               <button className={styles.cancelButton} onClick={() => onView(null)}>
                 Tutup
-              </button>
-              <button
-                className={styles.createButton}
-                onClick={() => {
-                  onView(null);
-                  onEdit(viewTarget);
-                }}
-              >
-                <IconEdit /> Edit Admin
               </button>
             </div>
           </section>

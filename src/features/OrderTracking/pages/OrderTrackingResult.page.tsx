@@ -1,6 +1,7 @@
 'use client';
 
 import { apiFetch } from '@services/apiFetch.service';
+import { clearOrderTrackingToken, getOrderTrackingToken } from '@utils/brandStorage';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -11,7 +12,6 @@ import {
   IconCheck,
   IconClipboardCheck,
   IconClock,
-  IconHeadset,
   IconPackage,
   IconShieldCheck,
 } from '@tabler/icons-react';
@@ -48,7 +48,7 @@ export const OrderTrackingResultPage = ({ orderId, checkoutResult = false }: Pro
     const fetchStatus = async () => {
       if (!polling) return;
       try {
-        const token = sessionStorage.getItem(`jokihub-tracking:${normalizedOrder}`);
+        const token = getOrderTrackingToken(normalizedOrder);
         if (!token) {
           polling = false;
           if (checkoutResult) {
@@ -77,7 +77,7 @@ export const OrderTrackingResultPage = ({ orderId, checkoutResult = false }: Pro
             return;
           }
           if ([400, 401, 404].includes(response.status)) {
-            sessionStorage.removeItem(`jokihub-tracking:${normalizedOrder}`);
+            clearOrderTrackingToken(normalizedOrder);
             polling = false;
             if (alive) setTracking(null);
             if (checkoutResult && response.status !== 404) {
@@ -88,7 +88,7 @@ export const OrderTrackingResultPage = ({ orderId, checkoutResult = false }: Pro
               return;
             }
           }
-          throw new Error(result.status?.message ?? 'Pelacakan pesanan tidak tersedia.');
+          throw new Error(result.message ?? 'Pelacakan pesanan tidak tersedia.');
         }
         if (alive) {
           setTracking(result.data as TrackingData);
@@ -195,9 +195,6 @@ export const OrderTrackingResultPage = ({ orderId, checkoutResult = false }: Pro
             <div className={styles.actions}>
               <Link className={styles.secondaryButton} href="/cek-pesanan">
                 <IconArrowLeft aria-hidden="true" /> Cek pesanan lain
-              </Link>
-              <Link className={styles.primaryButton} href="/bantuan">
-                <IconHeadset aria-hidden="true" /> Hubungi Bantuan
               </Link>
             </div>
           </div>

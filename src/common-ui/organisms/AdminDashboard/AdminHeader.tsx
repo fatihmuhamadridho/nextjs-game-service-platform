@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { IconBell, IconChevronDown, IconDeviceGamepad2, IconLogout, IconMenu2, IconSearch } from '@tabler/icons-react';
 import styles from './AdminHeader.module.css';
 import { FEATURE_SPRINT_2 } from '@configs/base.config';
+import { clearSessionType, sessionEndedEvent } from '@utils/brandStorage';
 
 type Props = {
   query: string;
@@ -14,12 +15,34 @@ type Props = {
   onMenuOpen: () => void;
 };
 
+type AdminProfile = { name: string; role: string };
+
 export const AdminHeader = ({ query, onQueryChange, onMenuOpen }: Props) => {
   const [profileOpen, setProfileOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
   const [logoutError, setLogoutError] = useState('');
+  const [profile, setProfile] = useState<AdminProfile | null>(null);
   const actionsRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    let active = true;
+    void apiFetch('/api/auth/v1/session?accountType=ADMIN', { cache: 'no-store' })
+      .then(async (response) => {
+        if (!response.ok) return null;
+        const payload = (await response.json()) as { data?: { name?: string; role?: string } };
+        return payload.data;
+      })
+      .then((account) => {
+        if (active && account?.name) setProfile({ name: account.name, role: account.role ?? 'Administrator' });
+      })
+      .catch(() => {
+        if (active) setProfile(null);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const logout = async () => {
     if (loggingOut) return;
@@ -28,10 +51,9 @@ export const AdminHeader = ({ query, onQueryChange, onMenuOpen }: Props) => {
     try {
       const response = await apiFetch('/api/admin/auth/v1/logout', { method: 'POST' });
       if (!response.ok) throw new Error('Logout gagal. Coba lagi.');
-      window.sessionStorage.removeItem('jokihub-session-type');
-      window.localStorage.removeItem('jokihub-session-type');
-      window.dispatchEvent(new Event('jokihub:session-ended'));
-      router.replace('/login');
+      clearSessionType();
+      window.dispatchEvent(new Event(sessionEndedEvent));
+      router.replace('/login?next=/admin');
       router.refresh();
     } catch (error) {
       setLogoutError(error instanceof Error ? error.message : 'Logout gagal. Coba lagi.');
@@ -65,7 +87,7 @@ export const AdminHeader = ({ query, onQueryChange, onMenuOpen }: Props) => {
         <a href="/admin">
           <IconDeviceGamepad2 />
           <b>
-            Joki<span>Hub</span>
+            bonga<span>store</span>
           </b>
         </a>
         <small>Admin</small>
@@ -95,10 +117,10 @@ export const AdminHeader = ({ query, onQueryChange, onMenuOpen }: Props) => {
           aria-controls="admin-profile-menu"
           onClick={() => setProfileOpen((open) => !open)}
         >
-          <span className={styles.avatar}>F</span>
+          <span className={styles.avatar}>{profile?.name.trim().charAt(0).toUpperCase() || 'A'}</span>
           <span>
-            <b>Fatih Muhamad Ridho</b>
-            <small>Super Admin</small>
+            <b>{profile?.name ?? 'Admin'}</b>
+            <small>{profile?.role ?? 'Administrator'}</small>
           </span>
           <IconChevronDown />
         </button>
@@ -110,13 +132,13 @@ export const AdminHeader = ({ query, onQueryChange, onMenuOpen }: Props) => {
           aria-controls="admin-profile-menu"
           onClick={() => setProfileOpen((open) => !open)}
         >
-          A
+          {profile?.name.trim().charAt(0).toUpperCase() || 'A'}
         </button>
         {profileOpen && (
           <div className={styles.profileDropdown} id="admin-profile-menu" role="menu" aria-label="Menu profil">
             <div className={styles.dropdownIdentity}>
-              <b>Fatih Muhamad Ridho</b>
-              <small>Super Admin</small>
+              <b>{profile?.name ?? 'Admin'}</b>
+              <small>{profile?.role ?? 'Administrator'}</small>
             </div>
             <button role="menuitem" disabled={loggingOut} onClick={() => void logout()}>
               <IconLogout aria-hidden="true" /> {loggingOut ? 'Keluar…' : 'Keluar'}

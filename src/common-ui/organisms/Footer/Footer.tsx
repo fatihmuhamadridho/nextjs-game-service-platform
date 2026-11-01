@@ -6,7 +6,7 @@ import { IconBrandDiscord, IconBrandInstagram, IconBrandTiktok, IconBrandYoutube
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { BrandLogo } from '../Header/BrandLogo';
-import { FEATURE_SPRINT_2 } from '@configs/base.config';
+import { withCurrentBrandName } from '@utils/display-brand';
 import styles from './Footer.module.css';
 
 type Props = { variant?: 'full' | 'compact' };
@@ -21,7 +21,7 @@ type PublicSettings = {
 type ServiceCategory = { name: string; slug: string };
 
 const defaultSettings: PublicSettings = {
-  siteName: 'JokiHub',
+  siteName: 'bongastore',
   siteDescription: '',
   contactEmail: '',
   contactWhatsapp: '',
@@ -48,7 +48,16 @@ export const Footer = ({ variant = 'full' }: Props) => {
         const response = await apiFetch('/api/settings/v1/public', { cache: 'no-store' });
         if (!response.ok) return;
         const result = (await response.json()) as { data?: Partial<PublicSettings> | null };
-        if (active && result.data) setSettings({ ...defaultSettings, ...result.data });
+        if (active && result.data)
+          setSettings({
+            ...defaultSettings,
+            ...result.data,
+            siteName: 'bongastore',
+            socialLinks: (result.data.socialLinks ?? []).map((link) => ({
+              ...link,
+              label: withCurrentBrandName(link.label),
+            })),
+          });
       } catch {}
     };
     const loadServiceCategories = async () => {
@@ -67,11 +76,11 @@ export const Footer = ({ variant = 'full' }: Props) => {
   }, []);
 
   const whatsappHref = settings.contactWhatsapp ? `https://wa.me/${settings.contactWhatsapp.replace(/\D/g, '')}` : null;
-  const description = settings.siteDescription.trim();
+  const description = withCurrentBrandName(settings.siteDescription).trim();
   const year = new Date().getFullYear();
 
   return variant === 'compact' ? (
-    <footer className={styles.compact} id="bantuan">
+    <footer className={styles.compact}>
       <BrandLogo name={settings.siteName} />
       {description && <p>{description}</p>}
       <div className={styles.socials}>
@@ -93,7 +102,7 @@ export const Footer = ({ variant = 'full' }: Props) => {
       </small>
     </footer>
   ) : (
-    <footer className={styles.footer} id="bantuan">
+    <footer className={styles.footer}>
       <div className={styles.grid}>
         <div className={styles.brand}>
           <BrandLogo name={settings.siteName} />
@@ -118,7 +127,6 @@ export const Footer = ({ variant = 'full' }: Props) => {
           <Link href="/">Beranda</Link>
           <a href="/games">Layanan</a>
           <Link href="/cek-pesanan">Cek Pesanan</Link>
-          {FEATURE_SPRINT_2 && <a href="/bantuan">Bantuan</a>}
           <a href="#tentang">Tentang Kami</a>
         </div>
         <div>
@@ -129,15 +137,6 @@ export const Footer = ({ variant = 'full' }: Props) => {
             </Link>
           ))}
         </div>
-        {FEATURE_SPRINT_2 && (
-          <div>
-            <h3>Bantuan</h3>
-            <a href="#bantuan">Pusat Bantuan</a>
-            <a href="#syarat">Syarat &amp; Ketentuan</a>
-            <a href="#privasi">Kebijakan Privasi</a>
-            <a href="/bantuan">Hubungi Kami</a>
-          </div>
-        )}
         <div>
           <h3>Kontak Kami</h3>
           {settings.contactEmail && <a href={`mailto:${settings.contactEmail}`}>✉ &nbsp;{settings.contactEmail}</a>}
@@ -152,10 +151,6 @@ export const Footer = ({ variant = 'full' }: Props) => {
       <div className={styles.bottom}>
         <span>
           © {year} {settings.siteName}. Semua hak dilindungi.
-        </span>
-        <span>
-          <a href="#syarat">Syarat &amp; Ketentuan</a>
-          <a href="#privasi">Kebijakan Privasi</a>
         </span>
       </div>
     </footer>

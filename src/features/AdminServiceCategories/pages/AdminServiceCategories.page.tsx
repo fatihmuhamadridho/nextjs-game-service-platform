@@ -26,8 +26,13 @@ export const AdminServiceCategoriesPage = () => {
     try {
       const response = await apiFetch('/api/admin/service-categories/v1/list', { cache: 'no-store' });
       const payload = await response.json();
-      if (!response.ok) throw new Error(payload.status?.message ?? 'Gagal memuat kategori.');
-      setCategories(payload.data.categories);
+      if (!response.ok) throw new Error(payload.message ?? 'Gagal memuat kategori.');
+      setCategories(
+        (payload.data.categories ?? []).map((category: AdminServiceCategoryView) => ({
+          ...category,
+          description: category.description ?? '',
+        }))
+      );
       setError('');
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Gagal memuat kategori.');
@@ -63,7 +68,12 @@ export const AdminServiceCategoriesPage = () => {
 
   const openEdit = (category: AdminServiceCategoryView) => {
     setEditingId(category.id);
-    setForm({ name: category.name, slug: category.slug, description: category.description, active: category.active });
+    setForm({
+      name: category.name,
+      slug: category.slug,
+      description: category.description ?? '',
+      active: category.active,
+    });
     setFormMode('edit');
   };
 
@@ -87,7 +97,7 @@ export const AdminServiceCategoriesPage = () => {
         }
       );
       const payload = await response.json();
-      if (!response.ok) throw new Error(payload.status?.message ?? 'Gagal menyimpan kategori.');
+      if (!response.ok) throw new Error(payload.message ?? 'Gagal menyimpan kategori.');
       setFormMode(null);
       await load();
     } catch (cause) {
@@ -103,7 +113,7 @@ export const AdminServiceCategoriesPage = () => {
         method: 'DELETE',
       });
       const payload = await response.json();
-      if (!response.ok) throw new Error(payload.status?.message ?? 'Gagal menghapus kategori.');
+      if (!response.ok) throw new Error(payload.message ?? 'Gagal menghapus kategori.');
       setDeleteTarget(null);
       await load();
     } catch (cause) {

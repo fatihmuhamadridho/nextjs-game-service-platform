@@ -1,8 +1,8 @@
-# JokiHub Project Guidance
+# Bongastore Project Guidance
 
 ## Product and design source
 
-- Treat `DESIGN.md` as the product and visual source of truth for the JokiHub gaming-services storefront.
+- Treat `DESIGN.md` as the product and visual source of truth for the Bongastore gaming-services storefront.
 - Build for the documented landing page and `/order/:gameSlug` checkout flow. Auth, order tracking, payment-provider screens, admin, and service management are future scope unless the user requests them.
 - Use Indonesian for customer-facing UI copy. Keep game and brand names as written.
 - Use dark mode by default: deep navy page and card surfaces, electric-blue primary actions, readable contrast, rounded cards, and compact layouts.

@@ -4,6 +4,7 @@ import { apiFetch } from '@services/apiFetch.service';
 
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { setOrderTrackingToken } from '@utils/brandStorage';
 import type {
   CheckoutApiResponse,
   CheckoutCreatedOrder,
@@ -12,12 +13,20 @@ import type {
 } from '../interfaces/checkout.interface';
 import { CheckoutTemplate } from '../templates/Checkout.template';
 const formatPrice = (price: number) => `Rp ${price.toLocaleString('id-ID')}`;
-const fetchServices = async (slug: string) => {
-  const response = await apiFetch(`/api/games/v1/${encodeURIComponent(slug)}/services`);
+const catalogRequestTimeoutMs = 15000;
+const getCatalogErrorMessage = (error: unknown, signal: AbortSignal) =>
+  signal.aborted
+    ? 'Permintaan katalog terlalu lama. Periksa koneksi lalu coba lagi.'
+    : error instanceof Error
+      ? error.message
+      : 'Katalog game dan layanan tidak dapat dimuat.';
+
+const fetchServices = async (slug: string, signal?: AbortSignal) => {
+  const response = await apiFetch(`/api/games/v1/${encodeURIComponent(slug)}/services`, { signal });
   const result = (await response.json()) as CheckoutApiResponse<{
     services: Array<{ id: string; name: string; price: number | null; customPrice: boolean; estimate: string }>;
   }>;
-  if (!response.ok || !result.data) throw new Error(result.status.message);
+  if (!response.ok || !result.data) throw new Error(result.message ?? 'Layanan game tidak dapat dimuat.');
   return result.data.services.map((service) => ({
     id: service.id,
     name: service.name,
@@ -38,25 +47,31 @@ export const CheckoutPage = ({ initialGameSlug = '' }: { initialGameSlug?: strin
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [apiMessage, setApiMessage] = useState('');
+  const [catalogError, setCatalogError] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('QRIS');
   const selected = services[selectedService];
   const total = useMemo(() => (selected?.price ? selected.price * quantity : 0), [selected?.price, quantity]);
 
   useEffect(() => {
     let alive = true;
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), catalogRequestTimeoutMs);
     void (async () => {
       try {
-        const response = await apiFetch('/api/games/v1/list?limit=100');
-        const result = (await response.json()) as CheckoutApiResponse<{
-          games: Array<{ id: string; name: string; slug: string; artworkKey: string | null }>;
-        }>;
-        if (!response.ok || !result.data) throw new Error(result.status.message);
-        const mapped = result.data.games.map((game) => ({
+        const response = await apiFetch('/api/games/v1/list?limit=100', { signal: controller.signal });
+        const result = (await response.json()) as CheckoutApiResponse<
+          | Array<{ id: string; name: string; slug: string; imageUrl?: string | null; artworkKey?: string | null }>
+          | { games: Array<{ id: string; name: string; slug: string; imageUrl?: string | null; artworkKey?: string | null }> }
+        >;
+        if (!response.ok || !result.data) throw new Error(result.message ?? 'Katalog game tidak dapat dimuat.');
+        setCatalogError('');
+        const apiGames = Array.isArray(result.data) ? result.data : result.data.games;
+        const mapped = apiGames.map((game) => ({
           id: game.id,
           slug: game.slug,
           name: game.name,
           mark: game.name.slice(0, 1),
-          art: game.artworkKey ?? game.slug,
+          art: game.artworkKey ?? game.imageUrl ?? game.slug,
         }));
         if (!alive) return;
         setGames(mapped);
@@ -64,19 +79,45 @@ export const CheckoutPage = ({ initialGameSlug = '' }: { initialGameSlug?: strin
           const initial = mapped.find((game) => game.slug === initialGameSlug);
           if (!initial) throw new Error('Game tidak tersedia di katalog.');
           setSelectedGame(initial.name);
-          setServices(await fetchServices(initial.slug));
+          setServices(await fetchServices(initial.slug, controller.signal));
           setSelectedService(0);
         }
       } catch (error) {
-        if (alive) setApiMessage(error instanceof Error ? error.message : 'Katalog tidak dapat dimuat.');
+        if (alive) setCatalogError(getCatalogErrorMessage(error, controller.signal));
       } finally {
+        window.clearTimeout(timeout);
         if (alive) setLoading(false);
       }
     })();
     return () => {
       alive = false;
+      controller.abort();
+      window.clearTimeout(timeout);
     };
   }, [initialGameSlug]);
+
+  const retryCatalog = () => {
+    const game = games.find((candidate) => candidate.name === selectedGame);
+    if (!game) {
+      window.location.reload();
+      return;
+    }
+
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), catalogRequestTimeoutMs);
+    setLoading(true);
+    setCatalogError('');
+    void fetchServices(game.slug, controller.signal)
+      .then((nextServices) => {
+        setServices(nextServices);
+        setSelectedService(0);
+      })
+      .catch((error: unknown) => setCatalogError(getCatalogErrorMessage(error, controller.signal)))
+      .finally(() => {
+        window.clearTimeout(timeout);
+        setLoading(false);
+      });
+  };
 
   const continueOrder = async () => {
     const form = document.getElementById('order-details') as HTMLFormElement | null;
@@ -116,9 +157,9 @@ export const CheckoutPage = ({ initialGameSlug = '' }: { initialGameSlug?: strin
       const result = (await response.json()) as CheckoutApiResponse<
         CheckoutCreatedOrder & { trackingToken: string; trackingTokenExpiresAt: string }
       >;
-      if (!response.ok || !result.data) throw new Error(result.status.message);
+      if (!response.ok || !result.data) throw new Error(result.message ?? 'Pesanan tidak dapat dibuat.');
       if (!result.data.trackingToken) throw new Error('Token akses pesanan tidak tersedia.');
-      sessionStorage.setItem(`jokihub-tracking:${result.data.order.orderNumber}`, result.data.trackingToken);
+      setOrderTrackingToken(result.data.order.orderNumber, result.data.trackingToken);
       router.push(`/order/${encodeURIComponent(result.data.order.orderNumber)}`);
     } catch (error) {
       setApiMessage(error instanceof Error ? error.message : 'Pesanan tidak dapat dibuat.');
@@ -137,6 +178,8 @@ export const CheckoutPage = ({ initialGameSlug = '' }: { initialGameSlug?: strin
       loading={loading}
       submitting={submitting}
       apiMessage={apiMessage}
+      catalogError={catalogError}
+      onRetryCatalog={retryCatalog}
       paymentMethod={paymentMethod}
       onPaymentMethod={setPaymentMethod}
       errors={errors}
@@ -148,16 +191,21 @@ export const CheckoutPage = ({ initialGameSlug = '' }: { initialGameSlug?: strin
         setSelectedService(0);
         setLoading(true);
         setApiMessage('');
+        setCatalogError('');
         const match = games.find((candidate) => candidate.name === game);
-        if (match)
-          void fetchServices(match.slug)
+        if (match) {
+          const controller = new AbortController();
+          const timeout = window.setTimeout(() => controller.abort(), catalogRequestTimeoutMs);
+          void fetchServices(match.slug, controller.signal)
             .then((nextServices) => {
               setServices(nextServices);
             })
-            .catch((error: unknown) =>
-              setApiMessage(error instanceof Error ? error.message : 'Layanan tidak dapat dimuat.')
-            )
-            .finally(() => setLoading(false));
+            .catch((error: unknown) => setCatalogError(getCatalogErrorMessage(error, controller.signal)))
+            .finally(() => {
+              window.clearTimeout(timeout);
+              setLoading(false);
+            });
+        }
         router.replace(
           `/order?game=${encodeURIComponent(games.find((candidate) => candidate.name === game)?.slug ?? '')}`
         );

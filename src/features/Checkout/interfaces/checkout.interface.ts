@@ -3,7 +3,9 @@ export type CheckoutService = { id: string; name: string; estimate: string; pric
 export type CheckoutFieldErrors = string[];
 
 export type CheckoutApiResponse<T> = {
-  status: { code: string; message: string };
+  code?: string;
+  message?: string;
+  status?: { code: string; message: string };
   data: T | null;
 };
 

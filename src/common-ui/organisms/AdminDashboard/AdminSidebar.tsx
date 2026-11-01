@@ -21,6 +21,7 @@ import {
 } from '@tabler/icons-react';
 import styles from './AdminSidebar.module.css';
 import { APP_VERSION } from '@configs/base.config';
+import { clearSessionType, sessionEndedEvent } from '@utils/brandStorage';
 
 type Props = { open: boolean; onClose: () => void; activeItem?: string };
 const groups = [
@@ -95,9 +96,7 @@ const routeFor = (label: string) =>
     Member: '/admin/members',
     Admin: '/admin/admins',
     Banner: '/admin/banners',
-    Pengumuman: '/admin/announcements',
     Halaman: '/admin/pages',
-    FAQ: '/admin/faqs',
     'Pengaturan Umum': '/admin/settings',
     'Akun & Role': '/admin/settings/accounts-roles',
     'Log Aktivitas': '/admin/activity-logs',
@@ -110,10 +109,9 @@ export const AdminSidebar = ({ open, onClose, activeItem = 'Dashboard' }: Props)
     try {
       const response = await apiFetch('/api/admin/auth/v1/logout', { method: 'POST' });
       if (response.ok) {
-        window.sessionStorage.removeItem('jokihub-session-type');
-        window.localStorage.removeItem('jokihub-session-type');
-        window.dispatchEvent(new Event('jokihub:session-ended'));
-        router.replace('/login');
+        clearSessionType();
+        window.dispatchEvent(new Event(sessionEndedEvent));
+        router.replace('/login?next=/admin');
         router.refresh();
       }
     } catch {
@@ -151,7 +149,7 @@ export const AdminSidebar = ({ open, onClose, activeItem = 'Dashboard' }: Props)
         <div className={styles.sidebarBrand}>
           <IconDeviceGamepad2 />
           <span>
-            <b>JokiHub</b>
+            <b>bongastore</b>
             <small>v{APP_VERSION}</small>
           </span>
           <button

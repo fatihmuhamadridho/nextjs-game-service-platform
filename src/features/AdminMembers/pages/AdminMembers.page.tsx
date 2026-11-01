@@ -61,7 +61,7 @@ export const AdminMembersPage = () => {
     try {
       const response = await apiFetch(`/api/admin/users/v1/list?${params}`, { cache: 'no-store' });
       const payload = await response.json();
-      if (!response.ok) throw new Error(payload.status?.message ?? 'Gagal memuat member.');
+      if (!response.ok) throw new Error(payload.message ?? 'Gagal memuat member.');
       setMembers((payload.data.users as ApiMember[]).map(mapMember));
       setError('');
     } catch (cause) {
@@ -83,7 +83,7 @@ export const AdminMembersPage = () => {
     try {
       const response = await apiFetch(`/api/admin/users/v1/detail/${member.id}`, { cache: 'no-store' });
       const payload = await response.json();
-      if (!response.ok) throw new Error(payload.status?.message ?? 'Gagal memuat detail member.');
+      if (!response.ok) throw new Error(payload.message ?? 'Gagal memuat detail member.');
       setDetailTarget(mapMember(payload.data.user as ApiMember));
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Gagal memuat detail member.');
@@ -100,7 +100,7 @@ export const AdminMembersPage = () => {
         body: JSON.stringify({ status: status === 'Aktif' ? 'ACTIVE' : 'BLOCKED' }),
       });
       const payload = await response.json();
-      if (!response.ok) throw new Error(payload.status?.message ?? 'Gagal memperbarui status member.');
+      if (!response.ok) throw new Error(payload.message ?? 'Gagal memperbarui status member.');
       await loadMembers();
       await viewMember(selectedMember);
     } catch (cause) {

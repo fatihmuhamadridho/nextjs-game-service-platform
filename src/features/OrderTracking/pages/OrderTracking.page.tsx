@@ -1,6 +1,7 @@
 'use client';
 
 import { apiFetch } from '@services/apiFetch.service';
+import { setOrderTrackingToken } from '@utils/brandStorage';
 
 import { useState, type FormEvent } from 'react';
 import Link from 'next/link';
@@ -9,14 +10,12 @@ import { Box, Button } from 'rangkaui';
 import {
   IconArrowRight,
   IconClipboardCheck,
-  IconHeadset,
   IconSearch,
   IconShieldCheck,
   IconTruckDelivery,
 } from '@tabler/icons-react';
 import { Header } from '@common-ui/organisms/Header/Header';
 import { Footer } from '@common-ui/organisms/Footer/Footer';
-import { FEATURE_SPRINT_2 } from '@configs/base.config';
 import styles from './OrderTracking.module.css';
 
 export const OrderTrackingPage = ({
@@ -48,9 +47,9 @@ export const OrderTrackingPage = ({
         body: JSON.stringify({ orderNumber: normalizedOrder, whatsapp: phone.trim() }),
       });
       const result = await response.json();
-      if (!response.ok || !result.data) throw new Error(result.status?.message ?? 'Pesanan tidak dapat diverifikasi.');
+      if (!response.ok || !result.data) throw new Error(result.message ?? 'Pesanan tidak dapat diverifikasi.');
       if (typeof result.data.trackingToken !== 'string') throw new Error('Token pelacakan tidak tersedia. Coba lagi.');
-      sessionStorage.setItem(`jokihub-tracking:${normalizedOrder}`, result.data.trackingToken);
+      setOrderTrackingToken(normalizedOrder, result.data.trackingToken);
       const paymentRoute = `/order/${encodeURIComponent(normalizedOrder)}`;
       const resultRoute = `${paymentRoute}/result`;
       router.push(
@@ -81,7 +80,7 @@ export const OrderTrackingPage = ({
           <h1>Cek Pesanan</h1>
           <p>Pantau status pesanan layanan game kamu dengan mudah.</p>
         </section>
-        <section className={`${styles.lookupLayout} ${!FEATURE_SPRINT_2 ? styles.lookupLayoutWide : ''}`}>
+        <section className={`${styles.lookupLayout} ${styles.lookupLayoutWide}`}>
           <Box className={styles.lookupCard} bordered rounded>
             <div className={styles.cardHeading}>
               <span>
@@ -129,15 +128,6 @@ export const OrderTrackingPage = ({
               <IconShieldCheck /> Data pesanan kamu hanya digunakan untuk verifikasi.
             </p>
           </Box>
-          {FEATURE_SPRINT_2 && (
-            <aside className={styles.helpCard}>
-              <h2>Butuh bantuan?</h2>
-              <p>Pastikan nomor pesanan dan nomor WhatsApp sesuai dengan detail pesanan kamu.</p>
-              <Link href="/bantuan">
-                <IconHeadset /> Hubungi Bantuan <IconArrowRight />
-              </Link>
-            </aside>
-          )}
         </section>
         <section className={styles.steps}>
           <h2>Bagaimana cara cek pesanan?</h2>
